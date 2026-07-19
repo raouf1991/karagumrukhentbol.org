@@ -1,57 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Karagümrük Admin</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    body{background:#eee;color:#111}.admin{display:grid;grid-template-columns:260px 1fr;min-height:100vh}.sidebar{background:#090909;color:#fff;padding:28px}.sidebar img{width:110px;background:#fff;border-radius:50%;margin-bottom:30px}.sidebar a{display:block;padding:13px 0;border-bottom:1px solid #222}.content{padding:40px}.admin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.admin-card{background:#fff;padding:22px;border-radius:10px;box-shadow:0 5px 20px #ddd}.notice{background:#fff3cd;border:1px solid #ffe69c;padding:16px;border-radius:8px;margin-bottom:24px}.settings-panel{background:#fff;padding:26px;border-radius:12px;box-shadow:0 5px 20px #ddd;margin-top:24px}.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.field{display:grid;gap:8px}.field label{font-weight:700}.field input[type=number]{padding:12px;border:1px solid #ccc;border-radius:6px}.switch-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #eee}.actions{display:flex;gap:12px;margin-top:22px}.save-btn,.reset-btn{border:0;padding:13px 22px;border-radius:6px;font-weight:800;cursor:pointer}.save-btn{background:#e10600;color:white}.reset-btn{background:#222;color:white}.success{display:none;margin-top:16px;padding:12px;background:#d1e7dd;border:1px solid #badbcc;border-radius:6px;color:#0f5132}@media(max-width:800px){.admin{grid-template-columns:1fr}.sidebar{display:none}.admin-grid,.settings-grid{grid-template-columns:1fr}.content{padding:20px}}
-  </style>
-</head>
-<body>
-<div class="admin">
-  <aside class="sidebar">
-    <img src="assets/club-logo.png" alt="Club logo">
-    <h2>Yönetim Paneli</h2>
-    <a href="#dashboard">Dashboard</a><a href="#homepage">Ana Sayfa Ayarları</a><a>Haberler</a><a>Maçlar</a><a>Oyuncular</a><a>Akademi Başvuruları</a><a>Üyelik Başvuruları</a><a>Bağışlar</a><a>Sponsorlar</a><a>Ayarlar</a><a href="index.html">Siteye Dön</a>
-  </aside>
-  <main class="content">
-    <h1>Karagümrük Hentbol Admin</h1>
-    <div class="notice"><strong>Geçiş sürümü:</strong> Aşağıdaki tasarım ayarları şu anda bu tarayıcıda kaydedilir. Supabase bağlantısından sonra tüm cihazlarda ve yetkili kullanıcılar için merkezi olarak çalışacaktır.</div>
-
-    <div id="dashboard" class="admin-grid">
-      <div class="admin-card"><h3>Haberler</h3><p>Yeni haber ekle, düzenle ve iki dilde yayınla.</p></div>
-      <div class="admin-card"><h3>Maçlar</h3><p>Takvim, sonuç ve rakip bilgilerini yönet.</p></div>
-      <div class="admin-card"><h3>Takım</h3><p>Oyuncu ve teknik ekip profillerini düzenle.</p></div>
-      <div class="admin-card"><h3>Akademi</h3><p>Programları ve başvuruları yönet.</p></div>
-      <div class="admin-card"><h3>Üyelik</h3><p>Şartları ve üyelik başvurularını yönet.</p></div>
-      <div class="admin-card"><h3>Bağışlar</h3><p>IBAN, ödeme linki ve bağış mesajını değiştir.</p></div>
-    </div>
-
-    <section id="homepage" class="settings-panel">
-      <h2>Ana Sayfa Tasarım Ayarları</h2>
-      <p>Değerleri değiştirip kaydet. Ardından “Siteye Dön” ile sonucu kontrol et.</p>
-      <div class="settings-grid">
-        <div class="field"><label for="clubLogoSize">Kulüp logosu boyutu (px)</label><input id="clubLogoSize" type="number" min="65" max="180" step="5"></div>
-        <div class="field"><label for="vitorraLogoWidth">Vitorra logo genişliği (px)</label><input id="vitorraLogoWidth" type="number" min="90" max="240" step="5"></div>
-        <div class="field"><label for="heroTitleSize">Ana başlık boyutu (px)</label><input id="heroTitleSize" type="number" min="48" max="120" step="2"></div>
-        <div class="field"><label for="heroMinHeight">Ana banner yüksekliği (px)</label><input id="heroMinHeight" type="number" min="480" max="850" step="10"></div>
-      </div>
-      <div class="switch-row"><span>Resmi partner kutusunu göster</span><input id="showPartnerBadge" type="checkbox"></div>
-      <div class="switch-row"><span>Hızlı bağlantılar bölümünü göster</span><input id="showQuickLinks" type="checkbox"></div>
-      <div class="actions"><button class="save-btn" id="saveSettings">Ayarları Kaydet</button><button class="reset-btn" id="resetSettings">Varsayılana Dön</button></div>
-      <div class="success" id="successMessage">Ayarlar kaydedildi. Siteye döndüğünde yeni görünüm uygulanacak.</div>
-    </section>
-  </main>
-</div>
-<script>
-const defaults={clubLogoSize:110,vitorraLogoWidth:140,heroTitleSize:88,heroMinHeight:650,showPartnerBadge:true,showQuickLinks:true};
-function getSettings(){try{return {...defaults,...JSON.parse(localStorage.getItem('khSiteSettings')||'{}')}}catch(e){return {...defaults}}}
-function fillForm(){const s=getSettings();Object.keys(defaults).forEach(k=>{const el=document.getElementById(k);if(!el)return;if(el.type==='checkbox')el.checked=Boolean(s[k]);else el.value=s[k]})}
-document.getElementById('saveSettings').addEventListener('click',()=>{const settings={clubLogoSize:Number(document.getElementById('clubLogoSize').value),vitorraLogoWidth:Number(document.getElementById('vitorraLogoWidth').value),heroTitleSize:Number(document.getElementById('heroTitleSize').value),heroMinHeight:Number(document.getElementById('heroMinHeight').value),showPartnerBadge:document.getElementById('showPartnerBadge').checked,showQuickLinks:document.getElementById('showQuickLinks').checked};localStorage.setItem('khSiteSettings',JSON.stringify(settings));const msg=document.getElementById('successMessage');msg.style.display='block';setTimeout(()=>msg.style.display='none',3500)});
-document.getElementById('resetSettings').addEventListener('click',()=>{localStorage.removeItem('khSiteSettings');fillForm();const msg=document.getElementById('successMessage');msg.textContent='Varsayılan ayarlara dönüldü.';msg.style.display='block';setTimeout(()=>{msg.style.display='none';msg.textContent='Ayarlar kaydedildi. Siteye döndüğünde yeni görünüm uygulanacak.'},2500)});
-fillForm();
-</script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Karagümrük Admin</title><link rel="stylesheet" href="styles.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef0f3;color:#111;font-family:Inter,Arial,sans-serif}.hidden{display:none!important}.login-page{min-height:100vh;display:grid;place
