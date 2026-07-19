@@ -1,1 +1,138 @@
-const cfg=window.KH_SUPABASE||{};const db=window.supabase.createClient(cfg.url,cfg.publishableKey);const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function msg(text,error=false,target='#globalMsg'){const e=$(target);if(!e)return;e.className=error?'msg error':'msg';e.textContent=text;setTimeout(()=>{e.textContent='';e.className=''},4000)}function val(v){return v===''?null:v}function formData(f){return Object.fromEntries(new FormData(f).entries())}async function isAdmin(user){const {data,error}=await db.from('admin_users').select('role').eq('user_id',user.id).maybeSingle();return !error&&!!data}async function showSession(session){if(!session){$('#login').classList.remove('hidden');$('#app').classList.add('hidden');return}if(!(await isAdmin(session.user))){await db.auth.signOut();msg('Bu hesap yönetici olarak tanımlı değil.',true,'#loginMsg');return}$('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#userEmail').textContent=session.user.email;await loadAll()}$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const {error}=await db.auth.signInWithPassword({email:$('#email').value,password:$('#password').value});if(error)msg('Giriş başarısız: '+error.message,true,'#loginMsg')});$('#logout').onclick=()=>db.auth.signOut();$('#refresh').onclick=loadAll;db.auth.onAuthStateChange((_,s)=>showSession(s));db.auth.getSession().then(({data})=>showSession(data.session));$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.tab').forEach(x=>x.classList.add('hidden'));$('#'+b.dataset.tab).classList.remove('hidden')});async function loadAll(){await Promise.all([loadSettings(),loadNews(),loadMatches(),loadPlayers(),loadApplications('academy_applications','#academyList'),loadApplications('membership_requests','#membershipList'),loadSponsors()]);updateCounts()}function fillForm(f,d){Object.entries(d||{}).forEach(([k,v])=>{const e=f.elements[k];if(!e)return;if(e.type==='checkbox')e.checked=!!v;else e.value=v??''})}async function loadSettings(){const {data,error}=await db.from('site_settings').select('*').eq('id',1).single();if(error)return msg(error.message,true);fillForm($('#settingsForm'),data)}$('#settingsForm').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,d=formData(f);['club_logo_size','vitorra_logo_width','hero_title_size','hero_min_height'].forEach(k=>d[k]=Number(d[k]));d.show_partner_badge=f.elements.show_partner_badge.checked;d.show_quick_links=f.elements.show_quick_links.checked;d.updated_at=new Date().toISOString();const {error}=await db.from('site_settings').update(d).eq('id',1);msg(error?error.message:'Ayarlar kaydedildi.',!!error)}function item(title,body,id,table,extra=''){return `<div class="item"><div class="item-head"><strong>${esc(title)}</strong><span>${extra}</span></div><div>${body}</div><div class="actions"><button class="danger" data-delete="${table}" data-id="${id}">Sil</button></div></div>`}async function bindDeletes(){$$('[data-delete]').forEach(b=>b.onclick=async()=>{if(!confirm('Silmek istediğinizden emin misiniz?'))return;const {error}=await db.from(b.dataset.delete).delete().eq('id',b.dataset.id);msg(error?error.message:'Silindi.',!!error);loadAll()})}async function loadNews(){const {data=[]}=await db.from('news').select('*').order('published_at',{ascending:false});$('#newsList').innerHTML=data.map(n=>item(n.title_tr,`<p>${esc(n.body_tr||'')}</p><small>${n.published?'Yayında':'Taslak'} · ${new Date(n.published_at).toLocaleString('tr-TR')}</small>`,n.id,'news')).join('')||'<div class="item">Henüz haber yok.</div>';bindDeletes()}$('#newsForm').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,d=formData(f);d.published=f.elements.published.checked;d.published_at=new Date().toISOString();const {error}=await db.from('news').insert(d);if(!error)f.reset();msg(error?error.message:'Haber eklendi.',!!error);loadNews()};async function loadMatches(){const {data=[]}=await db.from('matches').select('*').order('match_date',{ascending:false});$('#matchesList').innerHTML=data.map(m=>item(m.opponent,`<p>${new Date(m.match_date).toLocaleString('tr-TR')} · ${esc(m.venue||'')}</p><small>${m.status}${m.home_score!=null?' · '+m.home_score+'-'+m.away_score:''}</small>`,m.id,'matches')).join('')||'<div class="item">Henüz maç yok.</div>';bindDeletes()}$('#matchForm').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,d=formData(f);d.match_date=new Date(d.match_date).toISOString();d.home_score=val(d.home_score)==null?null:Number(d.home_score);d.away_score=val(d.away_score)==null?null:Number(d.away_score);const {error}=await db.from('matches').insert(d);if(!error)f.reset();msg(error?error.message:'Maç eklendi.',!!error);loadMatches()};async function loadPlayers(){const {data=[]}=await db.from('players').select('*').order('number');$('#playersList').innerHTML=data.map(p=>item(`${p.number??''} ${p.name}`,`<p>${esc(p.position_tr||'')} · ${esc(p.nationality||'')}</p><small>${p.active?'Aktif':'Pasif'}</small>`,p.id,'players')).join('')||'<div class="item">Henüz oyuncu yok.</div>';bindDeletes()}$('#playerForm').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,d=formData(f);['number','height_cm','weight_kg'].forEach(k=>d[k]=val(d[k])==null?null:Number(d[k]));d.active=f.elements.active.checked;const {error}=await db.from('players').insert(d);if(!error)f.reset();msg(error?error.message:'Oyuncu eklendi.',!!error);loadPlayers()};async function loadApplications(table,target){const {data=[],error}=await db.from(table).select('*').order('created_at',{ascending:false});if(error){$(target).innerHTML='<div class="item">'+esc(error.message)+'</div>';return}$(target).innerHTML=data.map(a=>`<div class="item"><div class="item-head"><strong>${esc(a.full_name)}</strong><span>${new Date(a.created_at).toLocaleDateString('tr-TR')}</span></div><p>${esc(a.email)} · ${esc(a.phone||'')}</p><p>${esc(a.age_group||a.reason||'')}</p><div class="actions"><select data-status-table="${table}" data-id="${a.id}"><option value="new" ${a.status==='new'?'selected':''}>Yeni</option><option value="reviewing" ${a.status==='reviewing'?'selected':''}>İnceleniyor</option><option value="accepted" ${a.status==='accepted'?'selected':''}>Kabul</option><option value="rejected" ${a.status==='rejected'?'selected':''}>Red</option></select></div></div>`).join('')||'<div class="item">Başvuru yok.</div>';$$('[data-status-table]').forEach(s=>s.onchange=async()=>{const {error}=await db.from(s.dataset.statusTable).update({status:s.value}).eq('id',s.dataset.id);msg(error?error.message:'Durum güncellendi.',!!error)})}async function loadSponsors(){const {data=[]}=await db.from('sponsors').select('*').order('sort_order');$('#sponsorsList').innerHTML=data.map(s=>item(s.name,`<p>${esc(s.website_url||'')}</p><small>${s.active?'Aktif':'Pasif'}</small>`,s.id,'sponsors')).join('')||'<div class="item">Sponsor yok.</div>';bindDeletes()}$('#sponsorForm').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,d=formData(f);d.sort_order=Number(d.sort_order||0);d.active=f.elements.active.checked;const {error}=await db.from('sponsors').insert(d);if(!error)f.reset();msg(error?error.message:'Sponsor eklendi.',!!error);loadSponsors()};async function updateCounts(){const [n,m,p,a,u]=await Promise.all([db.from('news').select('*',{count:'exact',head:true}),db.from('matches').select('*',{count:'exact',head:true}),db.from('players').select('*',{count:'exact',head:true}),db.from('academy_applications').select('*',{count:'exact',head:true}).eq('status','new'),db.from('membership_requests').select('*',{count:'exact',head:true}).eq('status','new')]);$('#newsCount').textContent=n.count||0;$('#matchCount').textContent=m.count||0;$('#playerCount').textContent=p.count||0;$('#applicationCount').textContent=(a.count||0)+(u.count||0)}
+const cfg=window.KH_SUPABASE||{};
+const db=window.supabase.createClient(cfg.url,cfg.publishableKey);
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const toast=text=>{const el=$('#toast');el.textContent=text;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)};
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function checkAdmin(user){
+  const {data,error}=await db.from('admin_users').select('role').eq('user_id',user.id).maybeSingle();
+  return !error && !!data;
+}
+
+async function showSession(session){
+  if(!session){
+    $('#loginView').classList.remove('hidden');
+    $('#appView').classList.add('hidden');
+    return;
+  }
+  if(!(await checkAdmin(session.user))){
+    await db.auth.signOut();
+    $('#loginError').textContent='Bu hesap yönetici olarak tanımlı değil.';
+    return;
+  }
+  $('#loginView').classList.add('hidden');
+  $('#appView').classList.remove('hidden');
+  $('#userEmail').textContent=session.user.email||'';
+  await loadAll();
+}
+
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const email=$('#email').value.trim();
+  const password=$('#password').value;
+  const btn=e.currentTarget.querySelector('button');
+  $('#loginError').textContent='';
+  btn.disabled=true; btn.textContent='Giriş yapılıyor...';
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  btn.disabled=false; btn.textContent='Giriş Yap';
+  if(error){$('#loginError').textContent='Giriş başarısız: '+error.message;return;}
+  await showSession(data.session);
+});
+
+$('#logout').addEventListener('click',async()=>{await db.auth.signOut();showSession(null)});
+$('#refresh').addEventListener('click',loadAll);
+
+$$('.side [data-tab]').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('.tab').forEach(t=>t.classList.add('hidden'));
+  $('#'+btn.dataset.tab).classList.remove('hidden');
+  $('#pageTitle').textContent=btn.textContent.trim();
+}));
+
+async function loadAll(){
+  await Promise.all([loadSettings(),loadNews(),loadMatches(),loadPlayers(),loadApplications('academy_applications','#academyList'),loadApplications('membership_requests','#membershipList'),loadSponsors(),loadCounts()]);
+}
+
+async function loadCounts(){
+  const [n,m,p,a,u]=await Promise.all([
+    db.from('news').select('*',{count:'exact',head:true}),
+    db.from('matches').select('*',{count:'exact',head:true}),
+    db.from('players').select('*',{count:'exact',head:true}),
+    db.from('academy_applications').select('*',{count:'exact',head:true}).eq('status','new'),
+    db.from('membership_requests').select('*',{count:'exact',head:true}).eq('status','new')
+  ]);
+  $('#countNews').textContent=n.count||0;
+  $('#countMatches').textContent=m.count||0;
+  $('#countPlayers').textContent=p.count||0;
+  $('#countApps').textContent=(a.count||0)+(u.count||0);
+}
+
+async function loadSettings(){
+  const {data}=await db.from('site_settings').select('*').eq('id',1).maybeSingle();
+  if(!data)return;
+  const f=$('#settingsForm');
+  Object.entries(data).forEach(([k,v])=>{if(f.elements[k])f.elements[k].value=v??''});
+}
+$('#settingsForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=e.currentTarget,d=Object.fromEntries(new FormData(f));
+  d.club_logo_size=Number(d.club_logo_size||110);
+  d.updated_at=new Date().toISOString();
+  const {error}=await db.from('site_settings').update(d).eq('id',1);
+  toast(error?error.message:'Ayarlar kaydedildi');
+});
+
+function listHtml(rows,render){return rows.length?rows.map(render).join(''):'<p>Kayıt yok.</p>'}
+function bindDelete(){
+  $$('[data-delete]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Silmek istediğinizden emin misiniz?'))return;
+    const {error}=await db.from(b.dataset.delete).delete().eq('id',b.dataset.id);
+    toast(error?error.message:'Silindi'); if(!error)loadAll();
+  });
+}
+
+async function loadNews(){
+  const {data=[]}=await db.from('news').select('*').order('published_at',{ascending:false});
+  $('#newsList').innerHTML=listHtml(data,n=>`<div class="card"><strong>${esc(n.title_tr)}</strong><p>${esc(n.body_tr||'')}</p><button class="btn danger" data-delete="news" data-id="${n.id}">Sil</button></div>`);bindDelete();
+}
+$('#newsForm').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.currentTarget,d=Object.fromEntries(new FormData(f));d.published=f.elements.published.checked;d.published_at=new Date().toISOString();
+  const {error}=await db.from('news').insert(d);toast(error?error.message:'Haber eklendi');if(!error){f.reset();loadNews();loadCounts()}
+});
+
+async function loadMatches(){
+  const {data=[]}=await db.from('matches').select('*').order('match_date',{ascending:false});
+  $('#matchList').innerHTML=listHtml(data,m=>`<div class="card"><strong>${esc(m.opponent)}</strong><p>${new Date(m.match_date).toLocaleString('tr-TR')} · ${esc(m.venue||'')}</p><button class="btn danger" data-delete="matches" data-id="${m.id}">Sil</button></div>`);bindDelete();
+}
+$('#matchForm').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.currentTarget,d=Object.fromEntries(new FormData(f));d.match_date=new Date(d.match_date).toISOString();d.home_score=d.home_score===''?null:Number(d.home_score);d.away_score=d.away_score===''?null:Number(d.away_score);
+  const {error}=await db.from('matches').insert(d);toast(error?error.message:'Maç eklendi');if(!error){f.reset();loadMatches();loadCounts()}
+});
+
+async function loadPlayers(){
+  const {data=[]}=await db.from('players').select('*').order('number');
+  $('#playerList').innerHTML=listHtml(data,p=>`<div class="card"><strong>${esc(p.number??'')} ${esc(p.name)}</strong><p>${esc(p.position_tr||'')}</p><button class="btn danger" data-delete="players" data-id="${p.id}">Sil</button></div>`);bindDelete();
+}
+$('#playerForm').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.currentTarget,d=Object.fromEntries(new FormData(f));d.number=d.number===''?null:Number(d.number);d.active=f.elements.active.checked;
+  const {error}=await db.from('players').insert(d);toast(error?error.message:'Oyuncu eklendi');if(!error){f.reset();loadPlayers();loadCounts()}
+});
+
+async function loadApplications(table,target){
+  const {data=[],error}=await db.from(table).select('*').order('created_at',{ascending:false});
+  if(error){$(target).innerHTML='<p>'+esc(error.message)+'</p>';return;}
+  $(target).innerHTML=listHtml(data,a=>`<div class="card"><strong>${esc(a.full_name)}</strong><p>${esc(a.email)} · ${esc(a.phone||'')}</p><p>${esc(a.age_group||a.reason||'')}</p><select data-status-table="${table}" data-id="${a.id}"><option value="new" ${a.status==='new'?'selected':''}>Yeni</option><option value="reviewing" ${a.status==='reviewing'?'selected':''}>İnceleniyor</option><option value="accepted" ${a.status==='accepted'?'selected':''}>Kabul</option><option value="rejected" ${a.status==='rejected'?'selected':''}>Red</option></select></div>`);
+  $$('[data-status-table]').forEach(s=>s.onchange=async()=>{const {error}=await db.from(s.dataset.statusTable).update({status:s.value}).eq('id',s.dataset.id);toast(error?error.message:'Durum güncellendi')});
+}
+
+async function loadSponsors(){
+  const {data=[]}=await db.from('sponsors').select('*').order('sort_order');
+  $('#sponsorList').innerHTML=listHtml(data,s=>`<div class="card"><strong>${esc(s.name)}</strong><p>${esc(s.website_url||'')}</p><button class="btn danger" data-delete="sponsors" data-id="${s.id}">Sil</button></div>`);bindDelete();
+}
+$('#sponsorForm').addEventListener('submit',async e=>{
+  e.preventDefault();const f=e.currentTarget,d=Object.fromEntries(new FormData(f));d.sort_order=Number(d.sort_order||0);d.active=true;
+  const {error}=await db.from('sponsors').insert(d);toast(error?error.message:'Sponsor eklendi');if(!error){f.reset();loadSponsors()}
+});
+
+db.auth.onAuthStateChange((_,session)=>showSession(session));
+db.auth.getSession().then(({data})=>showSession(data.session));
