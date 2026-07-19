@@ -10,16 +10,16 @@ function toast(text){const el=$('#toast');if(!el)return;el.textContent=text;el.c
 function withTimeout(promise,ms=15000){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('İstek zaman aşımına uğradı.')),ms))]);}
 function showLogin(){ $('#loginView').classList.remove('hidden'); $('#appView').classList.add('hidden'); }
 
-async function checkAdmin(user){
-  const {data,error}=await withTimeout(db.from('admin_users').select('role').eq('user_id',user.id).maybeSingle());
+async function checkAdmin(){
+  const {data,error}=await withTimeout(db.rpc('is_admin'));
   if(error) throw error;
-  return !!data;
+  return data===true;
 }
 
 async function enterPanel(session){
   if(!session?.user){showLogin();return;}
   setStatus('Yönetici hesabı kontrol ediliyor...');
-  const ok=await checkAdmin(session.user);
+  const ok=await checkAdmin();
   if(!ok){await db.auth.signOut();showLogin();setLoginError('Bu hesap yönetici olarak tanımlı değil.');setStatus('Sistem hazır');return;}
   $('#loginView').classList.add('hidden');
   $('#appView').classList.remove('hidden');
