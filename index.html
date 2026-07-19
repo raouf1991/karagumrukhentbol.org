@@ -11,191 +11,22 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a href="#home" class="brand" aria-label="Karagümrük Hentbol">
-        <img src="assets/club-logo.png" alt="Karagümrük Hentbol logo" />
-      </a>
-      <button class="menu-toggle" aria-label="Menüyü aç">☰</button>
-      <nav class="main-nav">
-        <a href="#home" data-tr="Ana Sayfa" data-en="Home">Ana Sayfa</a>
-        <a href="#club" data-tr="Kulüp" data-en="Club">Kulüp</a>
-        <a href="#team" data-tr="Takım" data-en="Team">Takım</a>
-        <a href="#matches" data-tr="Maçlar" data-en="Matches">Maçlar</a>
-        <a href="#news" data-tr="Haberler" data-en="News">Haberler</a>
-        <a href="#academy" data-tr="Akademi" data-en="Academy">Akademi</a>
-        <a href="#membership" data-tr="Üyelik" data-en="Membership">Üyelik</a>
-        <a href="#donate" data-tr="Bağış" data-en="Donate">Bağış</a>
-        <a href="#contact" data-tr="İletişim" data-en="Contact">İletişim</a>
-      </nav>
-      <div class="header-actions">
-        <img class="vitorra-mini" src="assets/vitorra-logo.png" alt="Vitorra" />
-        <button class="lang-btn active" data-lang="tr">TR</button>
-        <button class="lang-btn" data-lang="en">EN</button>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section id="home" class="hero">
-      <div class="hero-pattern"></div>
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow" data-tr="Sahada kalp, tribünde güç" data-en="Heart on the court, strength in the stands">Sahada kalp, tribünde güç</p>
-          <h1><span>KARAGÜMRÜK</span><strong>HENTBOL</strong></h1>
-          <p class="hero-text" data-tr="Azim, disiplin ve takım ruhuyla geleceğin hentbolunu birlikte inşa ediyoruz." data-en="We build the future of handball together with determination, discipline and team spirit.">Azim, disiplin ve takım ruhuyla geleceğin hentbolunu birlikte inşa ediyoruz.</p>
-          <div class="hero-buttons">
-            <a class="btn btn-primary" href="#membership" data-tr="Üye Ol" data-en="Become a Member">Üye Ol</a>
-            <a class="btn btn-outline" href="#matches" data-tr="Maç Takvimi" data-en="Match Schedule">Maç Takvimi</a>
-          </div>
-        </div>
-        <div class="hero-visual">
-          <div class="ball ball-one"></div>
-          <div class="ball ball-two"></div>
-          <div class="player-card">
-            <div class="jersey-number">77</div>
-            <div class="player-label" data-tr="GÜÇ • HIZ • MÜCADELE" data-en="POWER • SPEED • FIGHT">GÜÇ • HIZ • MÜCADELE</div>
-          </div>
-          <div class="partner-badge">
-            <span data-tr="Resmi Spor Giyim Partneri" data-en="Official Sportswear Partner">Resmi Spor Giyim Partneri</span>
-            <img src="assets/vitorra-logo.png" alt="Vitorra" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="quick-links">
-      <div class="container quick-grid">
-        <a href="#team"><span>01</span><strong data-tr="Takımımız" data-en="Our Team">Takımımız</strong><small data-tr="Oyuncuları keşfet" data-en="Discover the players">Oyuncuları keşfet</small></a>
-        <a href="#matches"><span>02</span><strong data-tr="Maç Takvimi" data-en="Match Schedule">Maç Takvimi</strong><small data-tr="Yaklaşan maçlar" data-en="Upcoming matches">Yaklaşan maçlar</small></a>
-        <a href="#news"><span>03</span><strong data-tr="Haberler" data-en="News">Haberler</strong><small data-tr="Son gelişmeler" data-en="Latest updates">Son gelişmeler</small></a>
-        <a href="#academy"><span>04</span><strong data-tr="Akademi" data-en="Academy">Akademi</strong><small data-tr="Geleceğin yıldızları" data-en="Stars of tomorrow">Geleceğin yıldızları</small></a>
-        <a href="#membership"><span>05</span><strong data-tr="Üyelik" data-en="Membership">Üyelik</strong><small data-tr="Hemen başvur" data-en="Apply now">Hemen başvur</small></a>
-      </div>
-    </section>
-
-    <section id="news" class="section dark-section">
-      <div class="container">
-        <div class="section-heading">
-          <div><span class="section-kicker" data-tr="Kulüpten" data-en="From the club">Kulüpten</span><h2 data-tr="Son Haberler" data-en="Latest News">Son Haberler</h2></div>
-          <a href="#" data-tr="Tüm Haberler" data-en="All News">Tüm Haberler →</a>
-        </div>
-        <div class="cards-grid" id="newsGrid"></div>
-      </div>
-    </section>
-
-    <section id="matches" class="section light-section">
-      <div class="container two-col">
-        <div>
-          <span class="section-kicker" data-tr="Takvim" data-en="Schedule">Takvim</span>
-          <h2 data-tr="Yaklaşan Maç" data-en="Upcoming Match">Yaklaşan Maç</h2>
-          <div class="match-card">
-            <div class="match-teams">
-              <div class="team-logo"><img src="assets/club-logo.png" alt="Karagümrük"></div>
-              <strong>VS</strong>
-              <div class="opponent">RAKİP<br><span data-tr="Yakında" data-en="Coming soon">Yakında</span></div>
-            </div>
-            <div class="match-meta">
-              <span>📅 25.05.2026</span><span>🕔 17:00</span><span>📍 Burhan Felek Spor Salonu</span>
-            </div>
-          </div>
-        </div>
-        <div id="club">
-          <span class="section-kicker" data-tr="Kim olduğumuz" data-en="Who we are">Kim olduğumuz</span>
-          <h2 data-tr="Karagümrük Ruhuyla" data-en="The Karagümrük Spirit">Karagümrük Ruhuyla</h2>
-          <p data-tr="Kulübümüz, sporun birleştirici gücünü gençlere ulaştırmayı, disiplinli sporcular yetiştirmeyi ve hentbol kültürünü büyütmeyi hedefler." data-en="Our club aims to bring the unifying power of sport to young people, develop disciplined athletes and grow handball culture.">Kulübümüz, sporun birleştirici gücünü gençlere ulaştırmayı, disiplinli sporcular yetiştirmeyi ve hentbol kültürünü büyütmeyi hedefler.</p>
-          <div class="stats"><div><strong>2017</strong><span data-tr="Kuruluş" data-en="Founded">Kuruluş</span></div><div><strong>2</strong><span data-tr="Dil" data-en="Languages">Dil</span></div><div><strong>100%</strong><span data-tr="Takım Ruhu" data-en="Team Spirit">Takım Ruhu</span></div></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="team" class="section dark-section">
-      <div class="container">
-        <div class="section-heading"><div><span class="section-kicker" data-tr="Kadromuz" data-en="Our squad">Kadromuz</span><h2 data-tr="Takım" data-en="Team">Takım</h2></div></div>
-        <div class="players-grid">
-          <article class="player"><div class="player-photo">07</div><h3 data-tr="Oyuncu Profili" data-en="Player Profile">Oyuncu Profili</h3><p data-tr="Pozisyon bilgisi" data-en="Position information">Pozisyon bilgisi</p></article>
-          <article class="player"><div class="player-photo">11</div><h3 data-tr="Oyuncu Profili" data-en="Player Profile">Oyuncu Profili</h3><p data-tr="Pozisyon bilgisi" data-en="Position information">Pozisyon bilgisi</p></article>
-          <article class="player"><div class="player-photo">23</div><h3 data-tr="Oyuncu Profili" data-en="Player Profile">Oyuncu Profili</h3><p data-tr="Pozisyon bilgisi" data-en="Position information">Pozisyon bilgisi</p></article>
-          <article class="player"><div class="player-photo">77</div><h3 data-tr="Oyuncu Profili" data-en="Player Profile">Oyuncu Profili</h3><p data-tr="Pozisyon bilgisi" data-en="Position information">Pozisyon bilgisi</p></article>
-        </div>
-      </div>
-    </section>
-
-    <section id="academy" class="section academy-section">
-      <div class="container academy-grid">
-        <div>
-          <span class="section-kicker" data-tr="Geleceğin yıldızları" data-en="Stars of tomorrow">Geleceğin yıldızları</span>
-          <h2 data-tr="Karagümrük Hentbol Akademisi" data-en="Karagümrük Handball Academy">Karagümrük Hentbol Akademisi</h2>
-          <p data-tr="Çocuklar ve gençler için yaş gruplarına uygun antrenman programları, uzman eğitmenler ve güvenli spor ortamı." data-en="Age-appropriate training programs, expert coaches and a safe sports environment for children and young people.">Çocuklar ve gençler için yaş gruplarına uygun antrenman programları, uzman eğitmenler ve güvenli spor ortamı.</p>
-          <a class="btn btn-primary" href="#academyForm" data-tr="Akademiye Başvur" data-en="Apply to Academy">Akademiye Başvur</a>
-        </div>
-        <form id="academyForm" class="form-card">
-          <h3 data-tr="Akademi Başvuru Formu" data-en="Academy Application Form">Akademi Başvuru Formu</h3>
-          <input required placeholder="Ad Soyad / Full Name">
-          <input required type="email" placeholder="E-posta / Email">
-          <input required placeholder="Telefon / Phone">
-          <select required><option value="" data-tr="Yaş Grubu" data-en="Age Group">Yaş Grubu</option><option>8-10</option><option>11-13</option><option>14-17</option></select>
-          <button class="btn btn-primary" type="submit" data-tr="Başvuruyu Gönder" data-en="Send Application">Başvuruyu Gönder</button>
-          <p class="form-note" data-tr="Bu ilk sürümde form e-posta istemcinizi açar. Sonraki adımda Supabase'e bağlanacaktır." data-en="In this first version the form opens your email client. It will be connected to Supabase in the next step.">Bu ilk sürümde form e-posta istemcinizi açar. Sonraki adımda Supabase'e bağlanacaktır.</p>
-        </form>
-      </div>
-    </section>
-
-    <section id="membership" class="section light-section">
-      <div class="container membership-grid">
-        <div>
-          <span class="section-kicker" data-tr="Kulübün parçası ol" data-en="Be part of the club">Kulübün parçası ol</span>
-          <h2 data-tr="Üyelik" data-en="Membership">Üyelik</h2>
-          <h3 data-tr="Üyelik Şartları" data-en="Membership Conditions">Üyelik Şartları</h3>
-          <ul class="conditions">
-            <li data-tr="Başvuru formunun eksiksiz doldurulması" data-en="Completion of the application form">Başvuru formunun eksiksiz doldurulması</li>
-            <li data-tr="Kulüp değerlerine ve etik kurallara uyum" data-en="Compliance with club values and ethical rules">Kulüp değerlerine ve etik kurallara uyum</li>
-            <li data-tr="Yönetim kurulu değerlendirmesi ve onayı" data-en="Board review and approval">Yönetim kurulu değerlendirmesi ve onayı</li>
-            <li data-tr="Varsa üyelik ücretinin ödenmesi" data-en="Payment of any applicable membership fee">Varsa üyelik ücretinin ödenmesi</li>
-          </ul>
-        </div>
-        <form id="membershipForm" class="form-card">
-          <h3 data-tr="Üyelik Başvuru Formu" data-en="Membership Application Form">Üyelik Başvuru Formu</h3>
-          <input required placeholder="Ad Soyad / Full Name">
-          <input required type="email" placeholder="E-posta / Email">
-          <input required placeholder="Telefon / Phone">
-          <textarea required placeholder="Başvuru nedeni / Reason for application"></textarea>
-          <label class="check"><input required type="checkbox"> <span data-tr="Üyelik şartlarını kabul ediyorum" data-en="I accept the membership conditions">Üyelik şartlarını kabul ediyorum</span></label>
-          <button class="btn btn-primary" type="submit" data-tr="Başvuruyu Gönder" data-en="Send Application">Başvuruyu Gönder</button>
-        </form>
-      </div>
-    </section>
-
-    <section id="donate" class="section donate-section">
-      <div class="container donate-box">
-        <div><span class="section-kicker" data-tr="Birlikte daha güçlüyüz" data-en="Stronger together">Birlikte daha güçlüyüz</span><h2 data-tr="Kulübe Destek Ol" data-en="Support the Club">Kulübe Destek Ol</h2><p data-tr="Bağışlarınız altyapı, akademi, spor ekipmanları ve genç sporcuların gelişimi için kullanılacaktır." data-en="Your donations support youth development, the academy, sports equipment and club growth.">Bağışlarınız altyapı, akademi, spor ekipmanları ve genç sporcuların gelişimi için kullanılacaktır.</p></div>
-        <div class="donate-actions"><a class="btn btn-white" href="mailto:info@karagumrukhentbol.org?subject=Kulübe%20Bağış" data-tr="Bağış Yap" data-en="Donate Now">Bağış Yap</a><small data-tr="IBAN ve ödeme bağlantısı panelden eklenecek" data-en="IBAN and payment link will be added from the admin panel">IBAN ve ödeme bağlantısı panelden eklenecek</small></div>
-      </div>
-    </section>
-
-    <section class="section sponsor-section">
-      <div class="container">
-        <div class="section-heading"><div><span class="section-kicker" data-tr="Resmi partner" data-en="Official partner">Resmi partner</span><h2 data-tr="Spor Giyim Partnerimiz" data-en="Our Sportswear Partner">Spor Giyim Partnerimiz</h2></div></div>
-        <img class="partner-banner" src="assets/official-partner-banner.png" alt="Karagümrük Hentbol and Vitorra official sportswear partnership">
-      </div>
-    </section>
-
-    <section id="contact" class="section dark-section">
-      <div class="container contact-grid">
-        <div><span class="section-kicker" data-tr="Bize ulaşın" data-en="Get in touch">Bize ulaşın</span><h2 data-tr="İletişim" data-en="Contact">İletişim</h2><p>info@karagumrukhentbol.org</p><p>İstanbul, Türkiye</p></div>
-        <form id="contactForm" class="form-card dark-form"><input required placeholder="Ad Soyad / Full Name"><input required type="email" placeholder="E-posta / Email"><textarea required placeholder="Mesaj / Message"></textarea><button class="btn btn-primary" type="submit" data-tr="Gönder" data-en="Send">Gönder</button></form>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container footer-grid">
-      <img src="assets/club-logo.png" alt="Karagümrük Hentbol">
-      <p>© 2026 Karagümrük Hentbol Spor Kulübü</p>
-      <a href="admin.html" data-tr="Yönetim Paneli" data-en="Admin Panel">Yönetim Paneli</a>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
+<header class="site-header"><div class="container nav-wrap"><a href="#home" class="brand"><img src="assets/club-logo.png" alt="Karagümrük Hentbol logo"></a><button class="menu-toggle" aria-label="Menüyü aç">☰</button><nav class="main-nav"><a href="#home" data-tr="Ana Sayfa" data-en="Home">Ana Sayfa</a><a href="#club" data-tr="Kulüp" data-en="Club">Kulüp</a><a href="#team" data-tr="Takım" data-en="Team">Takım</a><a href="#matches" data-tr="Maçlar" data-en="Matches">Maçlar</a><a href="#news" data-tr="Haberler" data-en="News">Haberler</a><a href="#academy" data-tr="Akademi" data-en="Academy">Akademi</a><a href="#membership" data-tr="Üyelik" data-en="Membership">Üyelik</a><a href="#donate" data-tr="Bağış" data-en="Donate">Bağış</a><a href="#contact" data-tr="İletişim" data-en="Contact">İletişim</a></nav><div class="header-actions"><img class="vitorra-mini" src="assets/vitorra-logo.png" alt="Vitorra"><button class="lang-btn active" data-lang="tr">TR</button><button class="lang-btn" data-lang="en">EN</button></div></div></header>
+<main>
+<section id="home" class="hero"><div class="hero-pattern"></div><div class="container hero-grid"><div class="hero-copy"><p class="eyebrow" data-tr="Sahada kalp, tribünde güç" data-en="Heart on the court, strength in the stands">Sahada kalp, tribünde güç</p><h1><span>KARAGÜMRÜK</span><strong>HENTBOL</strong></h1><p class="hero-text" data-tr="Azim, disiplin ve takım ruhuyla geleceğin hentbolunu birlikte inşa ediyoruz." data-en="We build the future of handball together with determination, discipline and team spirit.">Azim, disiplin ve takım ruhuyla geleceğin hentbolunu birlikte inşa ediyoruz.</p><div class="hero-buttons"><a class="btn btn-primary" href="#membership" data-tr="Üye Ol" data-en="Become a Member">Üye Ol</a><a class="btn btn-outline" href="#matches" data-tr="Maç Takvimi" data-en="Match Schedule">Maç Takvimi</a></div></div><div class="hero-visual"><div class="ball ball-one"></div><div class="ball ball-two"></div><div class="player-card"><div class="jersey-number">77</div><div class="player-label" data-tr="GÜÇ • HIZ • MÜCADELE" data-en="POWER • SPEED • FIGHT">GÜÇ • HIZ • MÜCADELE</div></div><div class="partner-badge"><span data-tr="Resmi Spor Giyim Partneri" data-en="Official Sportswear Partner">Resmi Spor Giyim Partneri</span><img src="assets/vitorra-logo.png" alt="Vitorra"></div></div></div></section>
+<section class="quick-links"><div class="container quick-grid"><a href="#team"><span>01</span><strong data-tr="Takımımız" data-en="Our Team">Takımımız</strong><small data-tr="Oyuncuları keşfet" data-en="Discover the players">Oyuncuları keşfet</small></a><a href="#matches"><span>02</span><strong data-tr="Maç Takvimi" data-en="Match Schedule">Maç Takvimi</strong><small data-tr="Yaklaşan maçlar" data-en="Upcoming matches">Yaklaşan maçlar</small></a><a href="#news"><span>03</span><strong data-tr="Haberler" data-en="News">Haberler</strong><small data-tr="Son gelişmeler" data-en="Latest updates">Son gelişmeler</small></a><a href="#academy"><span>04</span><strong data-tr="Akademi" data-en="Academy">Akademi</strong><small data-tr="Geleceğin yıldızları" data-en="Stars of tomorrow">Geleceğin yıldızları</small></a><a href="#membership"><span>05</span><strong data-tr="Üyelik" data-en="Membership">Üyelik</strong><small data-tr="Hemen başvur" data-en="Apply now">Hemen başvur</small></a></div></section>
+<section id="news" class="section dark-section"><div class="container"><div class="section-heading"><div><span class="section-kicker" data-tr="Kulüpten" data-en="From the club">Kulüpten</span><h2 data-tr="Son Haberler" data-en="Latest News">Son Haberler</h2></div></div><div class="cards-grid" id="newsGrid"></div></div></section>
+<section id="matches" class="section light-section"><div class="container two-col"><div><span class="section-kicker" data-tr="Takvim" data-en="Schedule">Takvim</span><h2 data-tr="Yaklaşan Maç" data-en="Upcoming Match">Yaklaşan Maç</h2><div class="match-card"><div class="match-teams"><div class="team-logo"><img src="assets/club-logo.png" alt="Karagümrük"></div><strong>VS</strong><div class="opponent">RAKİP<br><span data-tr="Yakında" data-en="Coming soon">Yakında</span></div></div><div class="match-meta"><span>📅 Yakında</span><span>🕔 --:--</span><span>📍 İstanbul</span></div></div></div><div id="club"><span class="section-kicker" data-tr="Kim olduğumuz" data-en="Who we are">Kim olduğumuz</span><h2 data-tr="Karagümrük Ruhuyla" data-en="The Karagümrük Spirit">Karagümrük Ruhuyla</h2><p data-tr="Kulübümüz, sporun birleştirici gücünü gençlere ulaştırmayı, disiplinli sporcular yetiştirmeyi ve hentbol kültürünü büyütmeyi hedefler." data-en="Our club aims to bring the unifying power of sport to young people, develop disciplined athletes and grow handball culture.">Kulübümüz, sporun birleştirici gücünü gençlere ulaştırmayı, disiplinli sporcular yetiştirmeyi ve hentbol kültürünü büyütmeyi hedefler.</p><div class="stats"><div><strong>2017</strong><span data-tr="Kuruluş" data-en="Founded">Kuruluş</span></div><div><strong>2</strong><span data-tr="Dil" data-en="Languages">Dil</span></div><div><strong>100%</strong><span data-tr="Takım Ruhu" data-en="Team Spirit">Takım Ruhu</span></div></div></div></div></section>
+<section id="team" class="section dark-section"><div class="container"><div class="section-heading"><div><span class="section-kicker" data-tr="Kadromuz" data-en="Our squad">Kadromuz</span><h2 data-tr="Takım" data-en="Team">Takım</h2></div></div><div class="players-grid"><article class="player"><div class="player-photo">07</div><h3>Oyuncu Profili</h3><p>Pozisyon bilgisi</p></article><article class="player"><div class="player-photo">11</div><h3>Oyuncu Profili</h3><p>Pozisyon bilgisi</p></article><article class="player"><div class="player-photo">23</div><h3>Oyuncu Profili</h3><p>Pozisyon bilgisi</p></article><article class="player"><div class="player-photo">77</div><h3>Oyuncu Profili</h3><p>Pozisyon bilgisi</p></article></div></div></section>
+<section id="academy" class="section academy-section"><div class="container academy-grid"><div><span class="section-kicker" data-tr="Geleceğin yıldızları" data-en="Stars of tomorrow">Geleceğin yıldızları</span><h2 data-tr="Karagümrük Hentbol Akademisi" data-en="Karagümrük Handball Academy">Karagümrük Hentbol Akademisi</h2><p data-tr="Çocuklar ve gençler için yaş gruplarına uygun antrenman programları, uzman eğitmenler ve güvenli spor ortamı." data-en="Age-appropriate training programs, expert coaches and a safe sports environment for children and young people.">Çocuklar ve gençler için yaş gruplarına uygun antrenman programları, uzman eğitmenler ve güvenli spor ortamı.</p><a class="btn btn-primary" href="#academyForm" data-tr="Akademiye Başvur" data-en="Apply to Academy">Akademiye Başvur</a></div><form id="academyForm" class="form-card"><h3 data-tr="Akademi Başvuru Formu" data-en="Academy Application Form">Akademi Başvuru Formu</h3><input required placeholder="Ad Soyad / Full Name"><input required type="email" placeholder="E-posta / Email"><input required placeholder="Telefon / Phone"><select required><option value="">Yaş Grubu / Age Group</option><option>8-10</option><option>11-13</option><option>14-17</option></select><button class="btn btn-primary" type="submit" data-tr="Başvuruyu Gönder" data-en="Send Application">Başvuruyu Gönder</button><p class="form-note" data-tr="Başvurunuz güvenli şekilde kulüp sistemine kaydedilir." data-en="Your application is securely saved in the club system.">Başvurunuz güvenli şekilde kulüp sistemine kaydedilir.</p></form></div></section>
+<section id="membership" class="section light-section"><div class="container membership-grid"><div><span class="section-kicker" data-tr="Kulübün parçası ol" data-en="Be part of the club">Kulübün parçası ol</span><h2 data-tr="Üyelik" data-en="Membership">Üyelik</h2><h3 data-tr="Üyelik Şartları" data-en="Membership Conditions">Üyelik Şartları</h3><ul class="conditions"><li data-tr="Başvuru formunun eksiksiz doldurulması" data-en="Completion of the application form">Başvuru formunun eksiksiz doldurulması</li><li data-tr="Kulüp değerlerine ve etik kurallara uyum" data-en="Compliance with club values and ethical rules">Kulüp değerlerine ve etik kurallara uyum</li><li data-tr="Yönetim kurulu değerlendirmesi ve onayı" data-en="Board review and approval">Yönetim kurulu değerlendirmesi ve onayı</li></ul></div><form id="membershipForm" class="form-card"><h3 data-tr="Üyelik Başvuru Formu" data-en="Membership Application Form">Üyelik Başvuru Formu</h3><input required placeholder="Ad Soyad / Full Name"><input required type="email" placeholder="E-posta / Email"><input required placeholder="Telefon / Phone"><textarea required placeholder="Başvuru nedeni / Reason for application"></textarea><label class="check"><input required type="checkbox"> <span data-tr="Üyelik şartlarını kabul ediyorum" data-en="I accept the membership conditions">Üyelik şartlarını kabul ediyorum</span></label><button class="btn btn-primary" type="submit" data-tr="Başvuruyu Gönder" data-en="Send Application">Başvuruyu Gönder</button></form></div></section>
+<section id="donate" class="section donate-section"><div class="container donate-box"><div><span class="section-kicker" data-tr="Birlikte daha güçlüyüz" data-en="Stronger together">Birlikte daha güçlüyüz</span><h2 data-tr="Kulübe Destek Ol" data-en="Support the Club">Kulübe Destek Ol</h2><p data-tr="Bağışlarınız altyapı, akademi, spor ekipmanları ve genç sporcuların gelişimi için kullanılacaktır." data-en="Your donations support youth development, the academy, sports equipment and club growth.">Bağışlarınız altyapı, akademi, spor ekipmanları ve genç sporcuların gelişimi için kullanılacaktır.</p></div><div class="donate-actions"><a class="btn btn-white" href="mailto:info@karagumrukhentbol.org?subject=Kulübe%20Bağış" data-tr="Bağış Yap" data-en="Donate Now">Bağış Yap</a><small data-tr="IBAN ve ödeme bağlantısı panelden yönetilir" data-en="IBAN and payment link are managed from the admin panel">IBAN ve ödeme bağlantısı panelden yönetilir</small></div></div></section>
+<section class="section sponsor-section"><div class="container"><div class="section-heading"><div><span class="section-kicker" data-tr="Resmi partner" data-en="Official partner">Resmi partner</span><h2 data-tr="Spor Giyim Partnerimiz" data-en="Our Sportswear Partner">Spor Giyim Partnerimiz</h2></div></div><img class="partner-banner" src="assets/official-partner-banner.png" alt="Karagümrük Hentbol and Vitorra official sportswear partnership"></div></section>
+<section id="contact" class="section dark-section"><div class="container contact-grid"><div><span class="section-kicker" data-tr="Bize ulaşın" data-en="Get in touch">Bize ulaşın</span><h2 data-tr="İletişim" data-en="Contact">İletişim</h2><p>info@karagumrukhentbol.org</p><p>İstanbul, Türkiye</p></div><form id="contactForm" class="form-card dark-form"><input required placeholder="Ad Soyad / Full Name"><input required type="email" placeholder="E-posta / Email"><textarea required placeholder="Mesaj / Message"></textarea><button class="btn btn-primary" type="submit" data-tr="Gönder" data-en="Send">Gönder</button></form></div></section>
+</main>
+<footer><div class="container footer-grid"><img src="assets/club-logo.png" alt="Karagümrük Hentbol"><p>© 2026 Karagümrük Hentbol Spor Kulübü</p><a href="admin.html" data-tr="Yönetim Paneli" data-en="Admin Panel">Yönetim Paneli</a></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
