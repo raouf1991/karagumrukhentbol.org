@@ -1,4 +1,4 @@
 window.KH_SUPABASE = {
-  url: 'PASTE_PROJECT_URL_HERE',
-  publishableKey: 'PASTE_PUBLISHABLE_KEY_HERE'
+  url: 'https://ukhnlbqjmulasfvgiqgn.supabase.co',
+  publishableKey: 'sb_publishable_nJDc_QBLF2IIr_we4PDJPQ_64YuLovu'
 };
