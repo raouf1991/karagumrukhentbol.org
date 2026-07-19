@@ -1,72 +1,21 @@
-const news = [
-  {date:'18.07.2026',tr:'Yeni sezon hazırlıkları başladı',en:'Pre-season preparations have begun',trText:'Takımımız yeni sezon için ilk antrenmanını gerçekleştirdi.',enText:'Our team held its first training session for the new season.'},
-  {date:'15.07.2026',tr:'Akademi kayıtları açıldı',en:'Academy registration is open',trText:'Genç sporcular için yeni dönem başvuruları başladı.',enText:'Applications for the new academy term are now open.'},
-  {date:'10.07.2026',tr:'Vitorra ile resmi iş birliği',en:'Official partnership with Vitorra',trText:'Vitorra, kulübümüzün resmi spor giyim partneri oldu.',enText:'Vitorra is now the club’s official sportswear partner.'}
-];
+const fallbackNews=[{published_at:'2026-07-18',title_tr:'Yeni sezon hazırlıkları başladı',title_en:'Pre-season preparations have begun',body_tr:'Takımımız yeni sezon için ilk antrenmanını gerçekleştirdi.',body_en:'Our team held its first training session for the new season.'}];
+const DEFAULT_SETTINGS={club_logo_size:110,vitorra_logo_width:140,hero_title_size:88,hero_min_height:650,show_partner_badge:true,show_quick_links:true,hero_title_tr:'KARAGÜMRÜK HENTBOL',hero_title_en:'KARAGÜMRÜK HANDBALL'};
+let currentLang=localStorage.getItem('siteLang')||'tr';
+let cmsNews=fallbackNews;
+const cfg=window.KH_SUPABASE||{};
+const db=(window.supabase&&cfg.url&&cfg.publishableKey)?window.supabase.createClient(cfg.url,cfg.publishableKey):null;
 
-const DEFAULT_SETTINGS = {
-  clubLogoSize: 110,
-  vitorraLogoWidth: 140,
-  heroTitleSize: 88,
-  heroMinHeight: 650,
-  showPartnerBadge: true,
-  showQuickLinks: true
-};
-
-let currentLang='tr';
-const grid=document.getElementById('newsGrid');
-
-function renderNews(){
-  if(!grid) return;
-  grid.innerHTML=news.map(n=>`<article class="news-card"><div class="news-image"></div><div class="news-body"><time>${n.date}</time><h3>${currentLang==='tr'?n.tr:n.en}</h3><p>${currentLang==='tr'?n.trText:n.enText}</p></div></article>`).join('');
-}
-
-function setLang(lang){
-  currentLang=lang;
-  document.documentElement.lang=lang;
-  document.querySelectorAll('[data-tr]').forEach(el=>{el.textContent=el.dataset[lang]});
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
-  localStorage.setItem('siteLang',lang);
-  renderNews();
-}
-
-function loadSiteSettings(){
-  let saved={};
-  try{saved=JSON.parse(localStorage.getItem('khSiteSettings')||'{}')}catch(e){saved={}}
-  const s={...DEFAULT_SETTINGS,...saved};
-
-  const clubLogo=document.querySelector('.brand img');
-  if(clubLogo){
-    clubLogo.style.width=`${s.clubLogoSize}px`;
-    clubLogo.style.height=`${s.clubLogoSize}px`;
-  }
-
-  const vitorra=document.querySelector('.vitorra-mini');
-  if(vitorra){
-    vitorra.style.width=`${s.vitorraLogoWidth}px`;
-    vitorra.style.height='auto';
-    vitorra.style.objectFit='contain';
-  }
-
-  const heroTitle=document.querySelector('.hero h1');
-  if(heroTitle) heroTitle.style.fontSize=`${s.heroTitleSize}px`;
-
-  const hero=document.querySelector('.hero');
-  const heroGrid=document.querySelector('.hero-grid');
-  if(hero) hero.style.minHeight=`${s.heroMinHeight}px`;
-  if(heroGrid) heroGrid.style.minHeight=`${s.heroMinHeight}px`;
-
-  const partnerBadge=document.querySelector('.partner-badge');
-  if(partnerBadge) partnerBadge.style.display=s.showPartnerBadge?'block':'none';
-
-  const quickLinks=document.querySelector('.quick-links');
-  if(quickLinks) quickLinks.style.display=s.showQuickLinks?'block':'none';
-}
-
-document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>setLang(btn.dataset.lang)));
-const menuToggle=document.querySelector('.menu-toggle');
-if(menuToggle) menuToggle.addEventListener('click',()=>document.querySelector('.main-nav')?.classList.toggle('open'));
-document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',e=>{e.preventDefault();alert(currentLang==='tr'?'Form alındı. Supabase bağlantısı bir sonraki aşamada etkinleştirilecek.':'Form received. Supabase connection will be enabled in the next phase.')}));
-
-loadSiteSettings();
-setLang(localStorage.getItem('siteLang')||'tr');
+function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderNews(){const grid=document.getElementById('newsGrid');if(!grid)return;grid.innerHTML=cmsNews.slice(0,6).map(n=>`<article class="news-card">${n.image_url?`<img class="news-image" src="${esc(n.image_url)}" alt="">`:'<div class="news-image"></div>'}<div class="news-body"><time>${new Date(n.published_at||n.created_at||Date.now()).toLocaleDateString(currentLang==='tr'?'tr-TR':'en-GB')}</time><h3>${esc(currentLang==='tr'?n.title_tr:n.title_en)}</h3><p>${esc(currentLang==='tr'?(n.body_tr||''):(n.body_en||''))}</p></div></article>`).join('');}
+function setLang(lang){currentLang=lang;document.documentElement.lang=lang;document.querySelectorAll('[data-tr]').forEach(el=>{if(el.dataset[lang]!==undefined)el.textContent=el.dataset[lang]});document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));localStorage.setItem('siteLang',lang);renderNews();applyHeroText(window.__settings||DEFAULT_SETTINGS);}
+function applyHeroText(s){const h=document.querySelector('.hero h1');if(h){const text=currentLang==='tr'?s.hero_title_tr:s.hero_title_en;const parts=(text||'').split(' ');h.innerHTML=`<span>${esc(parts.slice(0,-1).join(' ')||parts[0]||'')}</span><strong>${esc(parts.length>1?parts.at(-1):'')}</strong>`;}const p=document.querySelector('.hero-text');if(p){const t=currentLang==='tr'?s.hero_text_tr:s.hero_text_en;if(t)p.textContent=t;}}
+function applySettings(raw){const s={...DEFAULT_SETTINGS,...raw};window.__settings=s;const logo=document.querySelector('.brand img');if(logo)logo.style.width=logo.style.height=`${s.club_logo_size}px`;const vit=document.querySelector('.vitorra-mini');if(vit)vit.style.width=`${s.vitorra_logo_width}px`;const title=document.querySelector('.hero h1');if(title)title.style.fontSize=`${s.hero_title_size}px`;document.querySelectorAll('.hero,.hero-grid').forEach(el=>el.style.minHeight=`${s.hero_min_height}px`);const badge=document.querySelector('.partner-badge');if(badge)badge.style.display=s.show_partner_badge?'block':'none';const quick=document.querySelector('.quick-links');if(quick)quick.style.display=s.show_quick_links?'block':'none';applyHeroText(s);const contact=document.querySelector('#contact .contact-grid div p');if(contact&&s.contact_email)contact.textContent=s.contact_email;const donate=document.querySelector('.donate-actions a');if(donate&&s.donation_link){donate.href=s.donation_link;donate.target='_blank';}const note=document.querySelector('.donate-actions small');if(note&&s.donation_iban)note.textContent=`IBAN: ${s.donation_iban}`;}
+async function loadCms(){if(!db){applySettings(DEFAULT_SETTINGS);renderNews();return;}const [settingsRes,newsRes,matchesRes,playersRes]=await Promise.all([db.from('site_settings').select('*').eq('id',1).maybeSingle(),db.from('news').select('*').eq('published',true).order('published_at',{ascending:false}).limit(6),db.from('matches').select('*').order('match_date',{ascending:true}).gte('match_date',new Date().toISOString()).limit(1),db.from('players').select('*').eq('active',true).order('number',{ascending:true}).limit(8)]);applySettings(settingsRes.data||DEFAULT_SETTINGS);if(newsRes.data?.length)cmsNews=newsRes.data;renderNews();if(matchesRes.data?.[0])renderMatch(matchesRes.data[0]);if(playersRes.data?.length)renderPlayers(playersRes.data);}
+function renderMatch(m){const card=document.querySelector('.match-card');if(!card)return;const d=new Date(m.match_date);card.innerHTML=`<div class="match-teams"><div class="team-logo"><img src="assets/club-logo.png" alt="Karagümrük"></div><strong>VS</strong><div class="opponent">${esc(m.opponent)}</div></div><div class="match-meta"><span>📅 ${d.toLocaleDateString(currentLang==='tr'?'tr-TR':'en-GB')}</span><span>🕔 ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span><span>📍 ${esc(m.venue||'')}</span></div>`;}
+function renderPlayers(players){const grid=document.querySelector('.players-grid');if(!grid)return;grid.innerHTML=players.map(p=>`<article class="player">${p.image_url?`<img class="player-photo" src="${esc(p.image_url)}" alt="${esc(p.name)}">`:`<div class="player-photo">${esc(p.number??'')}</div>`}<h3>${esc(p.name)}</h3><p>${esc(currentLang==='tr'?(p.position_tr||''):(p.position_en||''))}</p></article>`).join('');}
+async function submitForm(table,payload,form){if(!db){alert('Supabase bağlantısı bulunamadı.');return;}const btn=form.querySelector('button[type=submit]');btn.disabled=true;const {error}=await db.from(table).insert(payload);btn.disabled=false;if(error){console.error(error);alert(currentLang==='tr'?'Gönderilemedi. Lütfen tekrar deneyin.':'Could not submit. Please try again.');return;}form.reset();alert(currentLang==='tr'?'Başvurunuz alındı.':'Your application was received.');}
+document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click',()=>setLang(btn.dataset.lang)));document.querySelector('.menu-toggle')?.addEventListener('click',()=>document.querySelector('.main-nav')?.classList.toggle('open'));
+document.getElementById('academyForm')?.addEventListener('submit',e=>{e.preventDefault();const f=e.currentTarget;submitForm('academy_applications',{full_name:f.elements[0].value,email:f.elements[1].value,phone:f.elements[2].value,age_group:f.elements[3].value},f)});
+document.getElementById('membershipForm')?.addEventListener('submit',e=>{e.preventDefault();const f=e.currentTarget;submitForm('membership_requests',{full_name:f.elements[0].value,email:f.elements[1].value,phone:f.elements[2].value,reason:f.elements[3].value},f)});
+document.getElementById('contactForm')?.addEventListener('submit',e=>{e.preventDefault();alert(currentLang==='tr'?'Mesajınız için teşekkürler.':'Thank you for your message.');e.currentTarget.reset();});
+setLang(currentLang);loadCms();
