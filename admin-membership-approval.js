@@ -29,12 +29,13 @@
     if(!confirm(warning))return;
     button.disabled=true;
     try{
-      const {error}=await db.from('membership_requests').delete().eq('id',row.id);
+      const {data:deleted,error}=await db.from('membership_requests').delete().eq('id',row.id).select('id');
       if(error)throw error;
+      if(!deleted||deleted.length===0)throw new Error('Kayıt silinmedi. Supabase DELETE yetkisi/policy eksik olabilir.');
       if(row.photo_url){
         try{const marker='/site-media/';const i=row.photo_url.indexOf(marker);if(i>=0){const path=decodeURIComponent(row.photo_url.slice(i+marker.length));await db.storage.from('site-media').remove([path]);}}catch(e){console.warn('Fotoğraf silinemedi',e);}
       }
-      notify('Üyelik başvurusu silindi.');
+      notify('Üyelik başvurusu kalıcı olarak silindi.');
       button.closest('.card')?.remove();
     }catch(error){notify('Başvuru silinemedi: '+(error.message||String(error)),true);button.disabled=false;}
   }
