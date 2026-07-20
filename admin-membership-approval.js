@@ -7,7 +7,7 @@
   const fmt=(value)=>value?new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(value)):'—';
 
   async function sendCard(db,row){
-    const {error}=await db.functions.invoke('send-membership-approved',{body:row});
+    const {error}=await db.functions.invoke('send-membership-approved-v2',{body:row});
     if(error)throw error;
   }
 
