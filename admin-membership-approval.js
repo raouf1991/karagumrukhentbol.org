@@ -5,9 +5,10 @@
   const client=()=>{if(approvalDb)return approvalDb;if(!window.supabase||!cfg.url||!cfg.publishableKey)return null;approvalDb=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return approvalDb;};
   const addOneYear=(date)=>{const d=new Date(date);d.setFullYear(d.getFullYear()+1);return d.toISOString().slice(0,10);};
   const fmt=(value)=>value?new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(value)):'—';
+  const esc=(v='')=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   async function sendCard(db,row){
-    const {error}=await db.functions.invoke('send-membership-approved-v2',{body:row});
+    const {error}=await db.functions.invoke('send-membership-approved-v3',{body:row});
     if(error)throw error;
   }
 
@@ -27,7 +28,7 @@
       const update={status:'accepted',membership_number:number,membership_type:membershipType,approved_at:approvedAt,valid_until:validUntil};
       const {data:updated,error:updateError}=await db.from('membership_requests').update(update).eq('id',id).select('*').single();
       if(updateError)throw updateError;
-      notify('Üyelik onaylandı, profesyonel kart hazırlanıyor...');
+      notify('Üyelik onaylandı, fotoğraflı kart hazırlanıyor...');
       await sendCard(db,updated);
       notify(`Üyelik kartı gönderildi. Üyelik No: ${number}`);
       select.value='accepted';select.dataset.previous='accepted';
@@ -55,7 +56,7 @@
     const db=client(),list=document.getElementById('membershipList');if(!db||!list)return;
     const selects=[...list.querySelectorAll('[data-status-table="membership_requests"]')];if(!selects.length)return;
     const ids=selects.map(s=>s.dataset.id).filter(Boolean);
-    const {data,error}=await db.from('membership_requests').select('id,status,membership_number,membership_type,approved_at,valid_until,approval_email_sent_at,email').in('id',ids);
+    const {data,error}=await db.from('membership_requests').select('id,status,membership_number,membership_type,approved_at,valid_until,approval_email_sent_at,email,photo_url').in('id',ids);
     if(error)return;
     const rows=new Map((data||[]).map(r=>[String(r.id),r]));
     selects.forEach(select=>{
@@ -63,9 +64,13 @@
       const row=rows.get(String(select.dataset.id)),card=select.closest('.card');if(!row||!card)return;
       card.querySelector('.membership-meta')?.remove();
       card.querySelector('.membership-resend')?.remove();
+      card.querySelector('.membership-photo')?.remove();
+      if(row.photo_url){
+        const photo=document.createElement('img');photo.className='membership-photo';photo.src=row.photo_url;photo.alt='Üye fotoğrafı';photo.style.cssText='width:110px;height:135px;object-fit:cover;border-radius:10px;border:3px solid #d50909;margin:10px 0;background:#eee';card.insertBefore(photo,card.firstChild);
+      }
       if(row.status==='accepted'&&row.membership_number){
         const meta=document.createElement('div');meta.className='membership-meta';meta.style.cssText='margin-top:12px;padding:12px;border-radius:9px;background:#f3f4f6;border-left:4px solid #d50909;line-height:1.65';
-        meta.innerHTML=`<strong style="font-size:16px">Üyelik No: ${row.membership_number}</strong><br><span>Tür: ${row.membership_type||'Yetişkin Üye'}</span><br><span>Onay: ${fmt(row.approved_at)} · Geçerlilik: ${fmt(row.valid_until)}</span><br><span>E-posta: ${row.approval_email_sent_at?'Gönderildi '+fmt(row.approval_email_sent_at):'Gönderim bekliyor'}</span>`;
+        meta.innerHTML=`<strong style="font-size:16px">Üyelik No: ${esc(row.membership_number)}</strong><br><span>Tür: ${esc(row.membership_type||'Yetişkin Üye')}</span><br><span>Onay: ${fmt(row.approved_at)} · Geçerlilik: ${fmt(row.valid_until)}</span><br><span>Fotoğraf: ${row.photo_url?'Yüklendi':'Yok'}</span><br><span>E-posta: ${row.approval_email_sent_at?'Gönderildi '+fmt(row.approval_email_sent_at):'Gönderim bekliyor'}</span>`;
         card.appendChild(meta);
         const btn=document.createElement('button');btn.type='button';btn.className='btn dark membership-resend';btn.dataset.id=row.id;btn.style.marginTop='10px';btn.textContent='Üyelik Kartını Yeniden Gönder';btn.onclick=()=>resendMembership(btn);card.appendChild(btn);
       }
