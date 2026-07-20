@@ -1,5 +1,5 @@
 -- Karagümrük Hentbol member portal and renewal system
--- Run once in Supabase SQL Editor.
+-- Safe to run again in Supabase SQL Editor.
 
 create table if not exists public.membership_renewals (
   id uuid primary key default gen_random_uuid(),
@@ -23,6 +23,7 @@ create index if not exists membership_renewals_status_idx on public.membership_r
 
 alter table public.membership_requests add column if not exists member_portal_enabled boolean not null default false;
 alter table public.membership_requests add column if not exists member_last_login_at timestamptz;
+alter table public.membership_requests add column if not exists member_auth_user_id uuid;
 alter table public.membership_requests add column if not exists card_url text;
 
 update public.membership_requests
@@ -38,12 +39,50 @@ stable
 security definer
 set search_path = public
 as $$
-  select lower(coalesce(auth.jwt()->>'email','')) in (
-    'raouf.tarek@gmail.com'
-  );
+  select lower(coalesce(auth.jwt()->>'email','')) in ('raouf.tarek@gmail.com');
 $$;
 
 grant execute on function public.is_club_admin() to authenticated;
+
+-- Secure portal lookup. It uses the authenticated JWT email, never an email supplied by the browser.
+create or replace function public.get_my_membership()
+returns setof public.membership_requests
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  jwt_email text := lower(trim(coalesce(auth.jwt()->>'email','')));
+  jwt_uid uuid := auth.uid();
+begin
+  if jwt_uid is null or jwt_email = '' then
+    return;
+  end if;
+
+  update public.membership_requests
+  set member_auth_user_id = coalesce(member_auth_user_id, jwt_uid),
+      member_last_login_at = now()
+  where lower(trim(email)) = jwt_email
+    and status = 'accepted'
+    and member_portal_enabled = true
+    and (member_auth_user_id is null or member_auth_user_id = jwt_uid);
+
+  return query
+  select m.*
+  from public.membership_requests m
+  where m.status = 'accepted'
+    and m.member_portal_enabled = true
+    and (
+      m.member_auth_user_id = jwt_uid
+      or (m.member_auth_user_id is null and lower(trim(m.email)) = jwt_email)
+    )
+  order by m.approved_at desc nulls last, m.created_at desc
+  limit 1;
+end;
+$$;
+
+revoke all on function public.get_my_membership() from public;
+grant execute on function public.get_my_membership() to authenticated;
 
 -- Members can see their accepted membership record only.
 drop policy if exists member_reads_own_membership on public.membership_requests;
@@ -51,7 +90,7 @@ create policy member_reads_own_membership
 on public.membership_requests for select
 to authenticated
 using (
-  lower(email) = lower(coalesce(auth.jwt()->>'email',''))
+  (member_auth_user_id = auth.uid() or lower(trim(email)) = lower(trim(coalesce(auth.jwt()->>'email',''))))
   and status = 'accepted'
   and member_portal_enabled = true
 );
@@ -61,18 +100,18 @@ drop policy if exists member_reads_own_renewals on public.membership_renewals;
 create policy member_reads_own_renewals
 on public.membership_renewals for select
 to authenticated
-using (lower(member_email) = lower(coalesce(auth.jwt()->>'email','')) or public.is_club_admin());
+using (lower(trim(member_email)) = lower(trim(coalesce(auth.jwt()->>'email',''))) or public.is_club_admin());
 
 drop policy if exists member_creates_own_renewal on public.membership_renewals;
 create policy member_creates_own_renewal
 on public.membership_renewals for insert
 to authenticated
 with check (
-  lower(member_email) = lower(coalesce(auth.jwt()->>'email',''))
+  lower(trim(member_email)) = lower(trim(coalesce(auth.jwt()->>'email','')))
   and exists (
     select 1 from public.membership_requests m
     where m.id = membership_request_id
-      and lower(m.email) = lower(coalesce(auth.jwt()->>'email',''))
+      and (m.member_auth_user_id = auth.uid() or lower(trim(m.email)) = lower(trim(coalesce(auth.jwt()->>'email',''))))
       and m.status = 'accepted'
       and m.member_portal_enabled = true
   )
