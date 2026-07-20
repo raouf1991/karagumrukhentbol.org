@@ -1,7 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import QRCode from 'npm:qrcode@1.5.4';
-import { Resvg } from 'npm:@resvg/resvg-js@2.6.2';
-import { Resend } from 'npm:resend@6';
+import { PDFDocument, StandardFonts, rgb } from 'npm:pdf-lib@1.17.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,6 +16,11 @@ const fmt = (v: string) => new Intl.DateTimeFormat('tr-TR', {
   day: '2-digit', month: 'long', year: 'numeric',
 }).format(new Date(v));
 
+const pdfSafe = (v = '') => String(v)
+  .replaceAll('ğ', 'g').replaceAll('Ğ', 'G')
+  .replaceAll('ş', 's').replaceAll('Ş', 'S')
+  .replaceAll('ı', 'i').replaceAll('İ', 'I');
+
 function bytesToBase64(bytes: Uint8Array) {
   let binary = '';
   for (let i = 0; i < bytes.length; i += 8192) {
@@ -25,53 +29,68 @@ function bytesToBase64(bytes: Uint8Array) {
   return btoa(binary);
 }
 
-async function fetchLogoDataUrl() {
-  const response = await fetch('https://karagumrukhentbol.org/assets/club-logo.png');
-  if (!response.ok) throw new Error('Kulüp logosu alınamadı.');
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  return `data:image/png;base64,${bytesToBase64(bytes)}`;
+function dataUrlToBytes(dataUrl: string) {
+  const base64 = dataUrl.split(',')[1] || '';
+  const binary = atob(base64);
+  return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
 
-function cardSvg(data: {
+async function createMembershipPdf(data: {
   name: string;
   number: string;
   type: string;
   approvedAt: string;
   validUntil: string;
-  qrSvg: string;
-  logoDataUrl: string;
+  verifyUrl: string;
 }) {
-  const qr = data.qrSvg
-    .replace(/<\?xml[^>]*>/g, '')
-    .replace(/<!DOCTYPE[^>]*>/g, '')
-    .replace('<svg', '<svg x="860" y="260" width="180" height="180"');
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([792, 468]);
+  const regular = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650">
-  <defs>
-    <linearGradient id="r" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#e21b16"/><stop offset="1" stop-color="#7a0000"/>
-    </linearGradient>
-  </defs>
-  <rect width="1100" height="650" rx="42" fill="#101010"/>
-  <path d="M770 0H1100V650H920L680 0Z" fill="url(#r)" opacity=".9"/>
-  <circle cx="155" cy="145" r="105" fill="#fff"/>
-  <image href="${data.logoDataUrl}" x="65" y="55" width="180" height="180"/>
-  <text x="300" y="115" fill="#fff" font-family="Arial, sans-serif" font-size="54" font-weight="800">KARAGÜMRÜK</text>
-  <text x="300" y="170" fill="#e21b16" font-family="Arial, sans-serif" font-size="38" font-weight="800">HENTBOL SPOR KULÜBÜ</text>
-  <text x="300" y="225" fill="#fff" font-family="Arial, sans-serif" font-size="28">ÜYELİK KARTI · MEMBERSHIP CARD</text>
-  <text x="75" y="345" fill="#aaa" font-family="Arial, sans-serif" font-size="22">ÜYE ADI</text>
-  <text x="75" y="385" fill="#fff" font-family="Arial, sans-serif" font-size="34" font-weight="700">${esc(data.name)}</text>
-  <text x="75" y="455" fill="#aaa" font-family="Arial, sans-serif" font-size="22">ÜYELİK NUMARASI</text>
-  <text x="75" y="495" fill="#fff" font-family="Arial, sans-serif" font-size="32" font-weight="700">${esc(data.number)}</text>
-  <text x="470" y="345" fill="#aaa" font-family="Arial, sans-serif" font-size="22">ÜYELİK TÜRÜ</text>
-  <text x="470" y="385" fill="#fff" font-family="Arial, sans-serif" font-size="30" font-weight="700">${esc(data.type)}</text>
-  <text x="470" y="455" fill="#aaa" font-family="Arial, sans-serif" font-size="22">KAYIT / GEÇERLİLİK</text>
-  <text x="470" y="495" fill="#fff" font-family="Arial, sans-serif" font-size="24">${esc(fmt(data.approvedAt))} — ${esc(fmt(data.validUntil))}</text>
-  ${qr}
-  <rect y="560" width="1100" height="90" fill="#c80d09"/>
-  <text x="75" y="618" fill="#fff" font-family="Arial, sans-serif" font-size="25">karagumrukhentbol.org</text>
-  <text x="720" y="618" fill="#fff" font-family="Arial, sans-serif" font-size="24">Raouf Tarek · Kulüp Başkanı</text>
-  </svg>`;
+  page.drawRectangle({ x: 0, y: 0, width: 792, height: 468, color: rgb(0.055, 0.055, 0.055) });
+  page.drawRectangle({ x: 0, y: 0, width: 792, height: 58, color: rgb(0.78, 0.04, 0.03) });
+  page.drawRectangle({ x: 575, y: 58, width: 217, height: 410, color: rgb(0.45, 0, 0), opacity: 0.9 });
+
+  try {
+    const logoResponse = await fetch('https://karagumrukhentbol.org/assets/club-logo.png');
+    if (logoResponse.ok) {
+      const logo = await pdf.embedPng(await logoResponse.arrayBuffer());
+      page.drawCircle({ x: 102, y: 365, size: 68, color: rgb(1, 1, 1) });
+      page.drawImage(logo, { x: 44, y: 307, width: 116, height: 116 });
+    }
+  } catch (_) {
+    // The card remains valid even if the remote logo is temporarily unavailable.
+  }
+
+  const qrDataUrl = await QRCode.toDataURL(data.verifyUrl, {
+    margin: 1,
+    width: 220,
+    color: { dark: '#111111', light: '#ffffff' },
+  });
+  const qrImage = await pdf.embedPng(dataUrlToBytes(qrDataUrl));
+  page.drawRectangle({ x: 620, y: 180, width: 130, height: 130, color: rgb(1, 1, 1) });
+  page.drawImage(qrImage, { x: 626, y: 186, width: 118, height: 118 });
+
+  page.drawText('KARAGUMRUK', { x: 195, y: 386, size: 37, font: bold, color: rgb(1, 1, 1) });
+  page.drawText('HENTBOL SPOR KULUBU', { x: 195, y: 348, size: 24, font: bold, color: rgb(0.88, 0.08, 0.06) });
+  page.drawText('UYELIK KARTI  /  MEMBERSHIP CARD', { x: 195, y: 315, size: 16, font: regular, color: rgb(0.92, 0.92, 0.92) });
+
+  page.drawText('UYE ADI', { x: 50, y: 244, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
+  page.drawText(pdfSafe(data.name), { x: 50, y: 214, size: 23, font: bold, color: rgb(1, 1, 1) });
+  page.drawText('UYELIK NUMARASI', { x: 50, y: 160, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
+  page.drawText(pdfSafe(data.number), { x: 50, y: 130, size: 22, font: bold, color: rgb(1, 1, 1) });
+
+  page.drawText('UYELIK TURU', { x: 330, y: 244, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
+  page.drawText(pdfSafe(data.type), { x: 330, y: 214, size: 20, font: bold, color: rgb(1, 1, 1) });
+  page.drawText('KAYIT / GECERLILIK', { x: 330, y: 160, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
+  page.drawText(`${pdfSafe(fmt(data.approvedAt))} - ${pdfSafe(fmt(data.validUntil))}`, { x: 330, y: 130, size: 14, font: regular, color: rgb(1, 1, 1) });
+
+  page.drawText('Karti dogrulamak icin QR kodu tarayin', { x: 601, y: 150, size: 10, font: regular, color: rgb(1, 1, 1) });
+  page.drawText('karagumrukhentbol.org', { x: 42, y: 22, size: 15, font: bold, color: rgb(1, 1, 1) });
+  page.drawText('Raouf Tarek  -  Kulup Baskani', { x: 548, y: 22, size: 13, font: bold, color: rgb(1, 1, 1) });
+
+  return await pdf.save();
 }
 
 function emailHtml(d: {
@@ -81,7 +100,7 @@ function emailHtml(d: {
   approvedAt: string;
   validUntil: string;
 }) {
-  return `<!doctype html><html><body style="margin:0;background:#ececec;font-family:Arial,sans-serif;color:#171717"><table width="100%" cellpadding="0" cellspacing="0" style="padding:25px 10px"><tr><td align="center"><table width="100%" style="max-width:680px;background:#fff;border-radius:18px;overflow:hidden"><tr><td style="background:#111;padding:28px;text-align:center;border-bottom:5px solid #d50909"><img src="https://karagumrukhentbol.org/assets/club-logo.png" width="90"><h1 style="color:#fff;margin:12px 0 0">KARAGÜMRÜK HENTBOL</h1></td></tr><tr><td style="padding:34px"><div style="color:#c20d09;font-weight:800">ÜYELİK ONAYI</div><h2 style="font-size:32px">Üyelik Başvurunuz Onaylandı!</h2><p style="font-size:17px;line-height:1.7">Merhaba <strong>${esc(d.name)}</strong>,</p><p style="font-size:16px;line-height:1.7">Üyelik başvurunuz yönetimimiz tarafından onaylanmıştır. Karagümrük Hentbol ailesine hoş geldiniz.</p><div style="background:#f5f5f5;border-left:5px solid #d50909;padding:18px;margin:22px 0"><strong>Üyelik No:</strong> ${esc(d.number)}<br><strong>Tür:</strong> ${esc(d.type)}<br><strong>Geçerlilik:</strong> ${esc(fmt(d.approvedAt))} — ${esc(fmt(d.validUntil))}</div><img src="cid:membership-card" alt="Üyelik Kartı" style="width:100%;max-width:620px;border-radius:14px;display:block"><p style="margin-top:30px;font-size:16px;line-height:1.7">Dijital üyelik kartınız ayrıca bu e-postaya PNG dosyası olarak eklenmiştir.</p><div style="margin-top:36px"><div style="font-family:cursive;font-size:34px">Raouf Tarek</div><strong>Raouf Tarek</strong><br>Kulüp Başkanı / Club President</div></td></tr><tr><td style="background:#111;color:#ddd;padding:22px;text-align:center">info@karagumrukhentbol.org · karagumrukhentbol.org</td></tr></table></td></tr></table></body></html>`;
+  return `<!doctype html><html><body style="margin:0;background:#ececec;font-family:Arial,sans-serif;color:#171717"><table width="100%" cellpadding="0" cellspacing="0" style="padding:25px 10px"><tr><td align="center"><table width="100%" style="max-width:680px;background:#fff;border-radius:18px;overflow:hidden"><tr><td style="background:#111;padding:28px;text-align:center;border-bottom:5px solid #d50909"><img src="https://karagumrukhentbol.org/assets/club-logo.png" width="90"><h1 style="color:#fff;margin:12px 0 0">KARAGÜMRÜK HENTBOL</h1></td></tr><tr><td style="padding:34px"><div style="color:#c20d09;font-weight:800">ÜYELİK ONAYI</div><h2 style="font-size:32px">Üyelik Başvurunuz Onaylandı!</h2><p style="font-size:17px;line-height:1.7">Merhaba <strong>${esc(d.name)}</strong>,</p><p style="font-size:16px;line-height:1.7">Üyelik başvurunuz yönetimimiz tarafından onaylanmıştır. Karagümrük Hentbol ailesine hoş geldiniz.</p><div style="background:#111;border-radius:16px;overflow:hidden;margin:24px 0;color:#fff"><div style="background:linear-gradient(135deg,#111 60%,#8d0000);padding:24px"><div style="font-size:12px;color:#aaa;letter-spacing:1px">DİJİTAL ÜYELİK KARTI</div><div style="font-size:25px;font-weight:800;margin-top:8px">${esc(d.name)}</div><table width="100%" style="margin-top:22px;color:#fff"><tr><td><small style="color:#aaa">ÜYELİK NO</small><br><strong>${esc(d.number)}</strong></td><td><small style="color:#aaa">TÜR</small><br><strong>${esc(d.type)}</strong></td></tr><tr><td colspan="2" style="padding-top:18px"><small style="color:#aaa">GEÇERLİLİK</small><br>${esc(fmt(d.approvedAt))} — ${esc(fmt(d.validUntil))}</td></tr></table></div><div style="background:#c80d09;padding:13px 24px;font-weight:700">Karagümrük Hentbol Spor Kulübü</div></div><p style="font-size:16px;line-height:1.7">Yazdırılabilir dijital üyelik kartınız bu e-postaya <strong>PDF</strong> olarak eklenmiştir.</p><div style="margin-top:36px"><div style="font-family:cursive;font-size:34px">Raouf Tarek</div><strong>Raouf Tarek</strong><br>Kulüp Başkanı / Club President</div></td></tr><tr><td style="background:#111;color:#ddd;padding:22px;text-align:center">info@karagumrukhentbol.org · karagumrukhentbol.org</td></tr></table></td></tr></table></body></html>`;
 }
 
 Deno.serve(async (req) => {
@@ -104,29 +123,27 @@ Deno.serve(async (req) => {
     if (!name || !email || !number || !validUntil) throw new Error('Missing membership data.');
 
     const verifyUrl = `https://karagumrukhentbol.org/?membership=${encodeURIComponent(number)}`;
-    const [qrSvg, logoDataUrl] = await Promise.all([
-      QRCode.toString(verifyUrl, { type: 'svg', margin: 1, width: 180, color: { dark: '#111111', light: '#ffffff' } }),
-      fetchLogoDataUrl(),
-    ]);
+    const pdfBytes = await createMembershipPdf({ name, number, type, approvedAt, validUntil, verifyUrl });
 
-    const svg = cardSvg({ name, number, type, approvedAt, validUntil, qrSvg, logoDataUrl });
-    const pngBytes = new Resvg(svg, { fitTo: { mode: 'width', value: 1100 } }).render().asPng();
-    const pngBase64 = bytesToBase64(pngBytes);
-
-    const resend = new Resend(apiKey);
-    const { data, error } = await resend.emails.send({
+    const payload = {
       from,
       to: [email],
       subject: 'Karagümrük Hentbol Üyeliğiniz Onaylandı',
       html: emailHtml({ name, number, type, approvedAt, validUntil }),
       attachments: [{
-        filename: `${number}-uyelik-karti.png`,
-        content: pngBase64,
-        contentType: 'image/png',
-        contentId: 'membership-card',
+        filename: `${number}-uyelik-karti.pdf`,
+        content: bytesToBase64(pdfBytes),
+        content_type: 'application/pdf',
       }],
+    };
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
-    if (error) throw new Error(error.message || 'Resend request failed.');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.message || 'Resend request failed.');
 
     if (id) {
       const url = Deno.env.get('SUPABASE_URL');
