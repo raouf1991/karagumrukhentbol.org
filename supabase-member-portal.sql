@@ -39,7 +39,10 @@ stable
 security definer
 set search_path = public
 as $$
-  select lower(coalesce(auth.jwt()->>'email','')) in ('raouf.tarek@gmail.com');
+  select lower(trim(coalesce(auth.jwt()->>'email',''))) in (
+    'raouf.tarek@gmail.com',
+    'info@karagumrukhentbol.org'
+  );
 $$;
 
 grant execute on function public.is_club_admin() to authenticated;
