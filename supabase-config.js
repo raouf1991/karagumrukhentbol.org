@@ -5,7 +5,7 @@ window.KH_SUPABASE = {
 
 if (/\/admin(?:\.html)?$/.test(location.pathname) || location.pathname.endsWith('/admin.html')) {
   const approvalScript = document.createElement('script');
-  approvalScript.src = 'admin-membership-approval.js?v=20260720-membership-card1';
+  approvalScript.src = 'admin-membership-approval.js?v=20260720-membership-card2';
   approvalScript.defer = true;
   document.head.appendChild(approvalScript);
 }
