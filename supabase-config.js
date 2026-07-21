@@ -8,4 +8,9 @@ if (/\/admin(?:\.html)?$/.test(location.pathname) || location.pathname.endsWith(
   approvalScript.src = 'admin-membership-approval.js?v=20260720-membership-card2';
   approvalScript.defer = true;
   document.head.appendChild(approvalScript);
+
+  const playerProfilesLinkScript = document.createElement('script');
+  playerProfilesLinkScript.src = 'admin-player-profiles-link.js?v=20260721-1';
+  playerProfilesLinkScript.defer = true;
+  document.head.appendChild(playerProfilesLinkScript);
 }
