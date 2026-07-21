@@ -20,9 +20,19 @@ if (isMainAdmin) {
   academyAdminScript.src = 'admin-academy.js?v=20260721-sync3';
   academyAdminScript.defer = true;
   document.head.appendChild(academyAdminScript);
+
+  const donationAdminScript = document.createElement('script');
+  donationAdminScript.src = 'admin-donations.js?v=20260721-1';
+  donationAdminScript.defer = true;
+  document.head.appendChild(donationAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
   const academyUpgradeScript = document.createElement('script');
   academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-public-cors2';
   academyUpgradeScript.defer = true;
   document.head.appendChild(academyUpgradeScript);
+
+  const donationUpgradeScript = document.createElement('script');
+  donationUpgradeScript.src = 'donation-upgrade.js?v=20260721-1';
+  donationUpgradeScript.defer = true;
+  document.head.appendChild(donationUpgradeScript);
 }
