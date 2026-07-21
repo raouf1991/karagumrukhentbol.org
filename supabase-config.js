@@ -17,7 +17,7 @@ if (isMainAdmin) {
   document.head.appendChild(playerProfilesLinkScript);
 
   const academyAdminScript = document.createElement('script');
-  academyAdminScript.src = 'admin-academy.js?v=20260721-1';
+  academyAdminScript.src = 'admin-academy.js?v=20260721-delete2';
   academyAdminScript.defer = true;
   document.head.appendChild(academyAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
