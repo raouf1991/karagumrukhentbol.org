@@ -23,13 +23,12 @@
   }
 
   async function submitApplication(payload) {
+    // Verify JWT is disabled for this public function, so no Authorization/apikey
+    // headers are needed. Omitting them avoids browser preflight/gateway failures.
     const response = await fetch(`${cfg.url}/functions/v1/sent-academy-application-email`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: cfg.publishableKey,
-        Authorization: `Bearer ${cfg.publishableKey}`,
-      },
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...payload, lang: tr() ? 'tr' : 'en' }),
     });
 
@@ -60,7 +59,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      if (!cfg.url || !cfg.publishableKey) {
+      if (!cfg.url) {
         return alert(text('Bağlantı hazırlanıyor, tekrar deneyin.', 'Connection is being prepared, please try again.'));
       }
 
@@ -92,7 +91,7 @@
         ));
       } catch (error) {
         console.error('Academy application failed:', error);
-        form.reset();
+        if (error?.saved) form.reset();
         if (error?.saved) {
           alert(text(
             'Başvurunuz kaydedildi ancak teşekkür e-postası gönderilemedi: ',
