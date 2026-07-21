@@ -1,6 +1,5 @@
 (() => {
   const cfg = window.KH_SUPABASE || {};
-  let academyDb = null;
 
   const tr = () => (localStorage.getItem('siteLang') || 'tr') === 'tr';
   const text = (turkish, english) => tr() ? turkish : english;
@@ -23,28 +22,33 @@
       </select>`;
   }
 
-  async function sendConfirmationEmail(payload) {
+  async function submitApplication(payload) {
     const response = await fetch(`${cfg.url}/functions/v1/sent-academy-application-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': cfg.publishableKey,
-        'Authorization': `Bearer ${cfg.publishableKey}`
+        apikey: cfg.publishableKey,
+        Authorization: `Bearer ${cfg.publishableKey}`,
       },
-      body: JSON.stringify({ ...payload, lang: tr() ? 'tr' : 'en' })
+      body: JSON.stringify({ ...payload, lang: tr() ? 'tr' : 'en' }),
     });
 
     let result = null;
     try { result = await response.json(); } catch (_) {}
+
     if (!response.ok || !result?.ok) {
-      throw new Error(result?.error || `Email function failed (${response.status})`);
+      const error = new Error(result?.error || `Application service failed (${response.status})`);
+      error.saved = Boolean(result?.saved);
+      throw error;
     }
+
     return result;
   }
 
   function prepareForm(form) {
     if (!form || form.dataset.academyUpgraded === '1') return;
     form.dataset.academyUpgraded = '1';
+
     const controls = form.querySelectorAll('input, select');
     if (controls[0]) controls[0].name = 'full_name';
     if (controls[1]) controls[1].name = 'email';
@@ -55,10 +59,18 @@
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (!academyDb) return alert(text('Bağlantı hazırlanıyor, tekrar deneyin.', 'Connection is being prepared, please try again.'));
+
+      if (!cfg.url || !cfg.publishableKey) {
+        return alert(text('Bağlantı hazırlanıyor, tekrar deneyin.', 'Connection is being prepared, please try again.'));
+      }
+
       const button = form.querySelector('button[type="submit"]');
       const original = button?.textContent || '';
-      if (button) { button.disabled = true; button.textContent = text('Gönderiliyor...', 'Sending...'); }
+      if (button) {
+        button.disabled = true;
+        button.textContent = text('Gönderiliyor...', 'Sending...');
+      }
+
       try {
         const fd = new FormData(form);
         const payload = {
@@ -70,37 +82,40 @@
           height_cm: Number(fd.get('height_cm')),
           dominant_hand: String(fd.get('dominant_hand') || ''),
           gender: String(fd.get('gender') || ''),
-          status: 'new'
         };
 
-        const { error } = await academyDb.from('academy_applications').insert(payload);
-        if (error) throw error;
-
-        try {
-          await sendConfirmationEmail(payload);
-          form.reset();
-          alert(text('Başvurunuz alındı. E-postanıza teşekkür mesajı gönderildi.', 'Your application was received. A thank-you email was sent to you.'));
-        } catch (mailError) {
-          console.error('Academy confirmation email failed:', mailError);
-          form.reset();
-          alert(text('Başvurunuz alındı ancak teşekkür e-postası gönderilemedi: ', 'Your application was received, but the thank-you email could not be sent: ') + (mailError?.message || String(mailError)));
-        }
+        await submitApplication(payload);
+        form.reset();
+        alert(text(
+          'Başvurunuz alındı. E-postanıza teşekkür mesajı gönderildi.',
+          'Your application was received. A thank-you email was sent to you.'
+        ));
       } catch (error) {
-        alert(text('Başvuru gönderilemedi: ', 'Application could not be sent: ') + (error?.message || String(error)));
+        console.error('Academy application failed:', error);
+        form.reset();
+        if (error?.saved) {
+          alert(text(
+            'Başvurunuz kaydedildi ancak teşekkür e-postası gönderilemedi: ',
+            'Your application was saved, but the thank-you email could not be sent: '
+          ) + (error?.message || String(error)));
+        } else {
+          alert(text('Başvuru gönderilemedi: ', 'Application could not be sent: ') + (error?.message || String(error)));
+        }
       } finally {
-        if (button) { button.disabled = false; button.textContent = original; }
+        if (button) {
+          button.disabled = false;
+          button.textContent = original;
+        }
       }
     }, true);
   }
 
-  function start(attempt = 0) {
+  function start() {
     const form = document.getElementById('academyForm');
-    if (!form || !cfg.url || !cfg.publishableKey) return;
-    if (!window.supabase) { if (attempt < 40) setTimeout(() => start(attempt + 1), 250); return; }
-    academyDb = window.supabase.createClient(cfg.url, cfg.publishableKey);
+    if (!form) return;
     prepareForm(form);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => start(), { once: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
   else start();
 })();
