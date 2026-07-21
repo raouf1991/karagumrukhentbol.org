@@ -28,21 +28,33 @@
 
   async function acceptApplication(id) {
     if (!confirm('Bu başvuruyu kabul etmek istiyor musunuz?')) return;
-    const { error } = await academyAdminDb.from('academy_applications').update({ status: 'accepted' }).eq('id', id);
+    const { data, error } = await academyAdminDb.from('academy_applications').update({ status: 'accepted' }).eq('id', id).select('id');
     if (error) return alert('Kabul işlemi başarısız: ' + error.message);
-    await renderAcademyApplications();
+    if (!data?.length) return alert('Başvuru güncellenemedi. Yönetici oturumunu yenileyip tekrar deneyin.');
+    await renderAcademyApplications(true);
   }
 
-  async function deleteApplication(id) {
+  async function deleteApplication(id, button) {
     if (!confirm('Bu akademi başvurusu kalıcı olarak silinsin mi?')) return;
-    const { error } = await academyAdminDb.from('academy_applications').delete().eq('id', id);
-    if (error) return alert('Silme işlemi başarısız: ' + error.message);
-    await renderAcademyApplications();
+    if (button) button.disabled = true;
+    const { data, error } = await academyAdminDb.from('academy_applications').delete().eq('id', id).select('id');
+    if (error) {
+      if (button) button.disabled = false;
+      return alert('Silme işlemi başarısız: ' + error.message);
+    }
+    if (!data?.length) {
+      if (button) button.disabled = false;
+      return alert('Başvuru silinemedi. Yönetici oturumunu yenileyip tekrar deneyin.');
+    }
+    document.querySelector(`[data-academy-card="${CSS.escape(String(id))}"]`)?.remove();
+    const list = document.getElementById('academyList');
+    if (list && !list.querySelector('[data-academy-card]')) list.innerHTML = '<p>Akademi başvurusu yok.</p>';
+    await renderAcademyApplications(true);
   }
 
-  async function renderAcademyApplications() {
+  async function renderAcademyApplications(force = false) {
     const list = document.getElementById('academyList');
-    if (!list || !academyAdminDb || rendering) return;
+    if (!list || !academyAdminDb || (rendering && !force)) return;
     rendering = true;
     try {
       const { data, error } = await academyAdminDb.from('academy_applications').select('*').order('created_at', { ascending: false });
@@ -64,9 +76,10 @@
       const byId = Object.fromEntries((data || []).map(a => [String(a.id), a]));
       list.querySelectorAll('[data-academy-print]').forEach(b => b.onclick = () => printApplication(byId[b.dataset.academyPrint]));
       list.querySelectorAll('[data-academy-accept]').forEach(b => b.onclick = () => acceptApplication(b.dataset.academyAccept));
-      list.querySelectorAll('[data-academy-delete]').forEach(b => b.onclick = () => deleteApplication(b.dataset.academyDelete));
+      list.querySelectorAll('[data-academy-delete]').forEach(b => b.onclick = () => deleteApplication(b.dataset.academyDelete, b));
     } catch (error) {
       console.error(error);
+      alert('Akademi başvuruları yenilenemedi: ' + (error?.message || String(error)));
     } finally {
       rendering = false;
     }
@@ -80,11 +93,11 @@
       if (!list) return setTimeout(attempt, 400);
       renderAcademyApplications();
       const observer = new MutationObserver(() => {
-        if (!rendering && list.dataset.academyEnhanced !== '1') setTimeout(renderAcademyApplications, 50);
+        if (!rendering && list.dataset.academyEnhanced !== '1') setTimeout(() => renderAcademyApplications(true), 50);
       });
       observer.observe(list, { childList: true, subtree: false, attributes: true, attributeFilter: ['data-academy-enhanced'] });
       setInterval(() => {
-        if (document.getElementById('academy')?.classList.contains('hidden') === false) renderAcademyApplications();
+        if (document.getElementById('academy')?.classList.contains('hidden') === false) renderAcademyApplications(true);
       }, 5000);
     };
     attempt();
