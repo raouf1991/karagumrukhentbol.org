@@ -26,31 +26,20 @@
   function prepareForm(form) {
     if (!form || form.dataset.academyUpgraded === '1') return;
     form.dataset.academyUpgraded = '1';
-
     const controls = form.querySelectorAll('input, select');
     if (controls[0]) controls[0].name = 'full_name';
     if (controls[1]) controls[1].name = 'email';
     if (controls[2]) controls[2].name = 'phone';
     if (controls[3]) controls[3].name = 'age_group';
-
-    const submit = form.querySelector('button[type="submit"]');
-    submit?.insertAdjacentHTML('beforebegin', fieldHtml());
+    form.querySelector('button[type="submit"]')?.insertAdjacentHTML('beforebegin', fieldHtml());
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (!academyDb) {
-        alert(text('Bağlantı hazırlanıyor, tekrar deneyin.', 'Connection is being prepared, please try again.'));
-        return;
-      }
-
+      if (!academyDb) return alert(text('Bağlantı hazırlanıyor, tekrar deneyin.', 'Connection is being prepared, please try again.'));
       const button = form.querySelector('button[type="submit"]');
       const original = button?.textContent || '';
-      if (button) {
-        button.disabled = true;
-        button.textContent = text('Gönderiliyor...', 'Sending...');
-      }
-
+      if (button) { button.disabled = true; button.textContent = text('Gönderiliyor...', 'Sending...'); }
       try {
         const fd = new FormData(form);
         const payload = {
@@ -64,38 +53,22 @@
           gender: String(fd.get('gender') || ''),
           status: 'new'
         };
-
-        const { data, error } = await academyDb
-          .from('academy_applications')
-          .insert(payload)
-          .select('id, created_at')
-          .single();
+        const { data, error } = await academyDb.from('academy_applications').insert(payload).select('id, created_at').single();
         if (error) throw error;
-
-        const { error: mailError } = await academyDb.functions.invoke('send-academy-application-email', {
+        const { error: mailError } = await academyDb.functions.invoke('sent-academy-application-email', {
           body: { ...payload, id: data?.id, created_at: data?.created_at, lang: tr() ? 'tr' : 'en' }
         });
-
         form.reset();
         if (mailError) {
           console.error('Academy confirmation email failed:', mailError);
-          alert(text(
-            'Başvurunuz alındı. Teşekkür e-postası kısa süre içinde gönderilecektir.',
-            'Your application was received. The thank-you email will be sent shortly.'
-          ));
+          alert(text('Başvurunuz alındı ancak teşekkür e-postası gönderilemedi.', 'Your application was received, but the thank-you email could not be sent.'));
         } else {
-          alert(text(
-            'Başvurunuz alındı. E-postanıza teşekkür mesajı gönderildi.',
-            'Your application was received. A thank-you email was sent to you.'
-          ));
+          alert(text('Başvurunuz alındı. E-postanıza teşekkür mesajı gönderildi.', 'Your application was received. A thank-you email was sent to you.'));
         }
       } catch (error) {
         alert(text('Başvuru gönderilemedi: ', 'Application could not be sent: ') + (error?.message || String(error)));
       } finally {
-        if (button) {
-          button.disabled = false;
-          button.textContent = original;
-        }
+        if (button) { button.disabled = false; button.textContent = original; }
       }
     }, true);
   }
@@ -103,17 +76,11 @@
   function start(attempt = 0) {
     const form = document.getElementById('academyForm');
     if (!form || !cfg.url || !cfg.publishableKey) return;
-    if (!window.supabase) {
-      if (attempt < 40) setTimeout(() => start(attempt + 1), 250);
-      return;
-    }
+    if (!window.supabase) { if (attempt < 40) setTimeout(() => start(attempt + 1), 250); return; }
     academyDb = window.supabase.createClient(cfg.url, cfg.publishableKey);
     prepareForm(form);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => start(), { once: true });
-  } else {
-    start();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => start(), { once: true });
+  else start();
 })();
