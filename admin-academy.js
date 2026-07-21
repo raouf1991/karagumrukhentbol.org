@@ -66,26 +66,37 @@
       list.querySelectorAll('[data-academy-delete]').forEach(b => b.onclick = () => deleteApplication(b.dataset.academyDelete, b));
     } catch (error) {
       console.error(error);
-      alert('Akademi başvuruları yenilenemedi: ' + (error?.message || String(error)));
     } finally {
       rendering = false;
     }
   }
 
-  function start() {
-    if (!window.supabase || !cfg.url || !cfg.publishableKey) return;
+  function start(attempt = 0) {
+    const list = document.getElementById('academyList');
+    if (!list || !cfg.url || !cfg.publishableKey || !window.supabase) {
+      if (attempt < 50) setTimeout(() => start(attempt + 1), 300);
+      return;
+    }
+
     academyAdminDb = window.supabase.createClient(cfg.url, cfg.publishableKey, { auth: { persistSession: true, autoRefreshToken: true } });
-    const attempt = () => {
-      const list = document.getElementById('academyList');
-      if (!list) return setTimeout(attempt, 400);
-      renderAcademyApplications();
-      const observer = new MutationObserver(() => { if (!rendering && list.dataset.academyEnhanced !== '1') setTimeout(() => renderAcademyApplications(true), 50); });
-      observer.observe(list, { childList: true, subtree: false, attributes: true, attributeFilter: ['data-academy-enhanced'] });
-      setInterval(() => { if (document.getElementById('academy')?.classList.contains('hidden') === false) renderAcademyApplications(true); }, 5000);
-    };
-    attempt();
+    renderAcademyApplications(true);
+
+    const observer = new MutationObserver(() => {
+      if (rendering) return;
+      const hasEnhancedCards = list.querySelector('[data-academy-card]');
+      const emptyEnhancedState = list.textContent?.includes('Akademi başvurusu yok.');
+      if (!hasEnhancedCards && !emptyEnhancedState) setTimeout(() => renderAcademyApplications(true), 80);
+    });
+    observer.observe(list, { childList: true, subtree: false });
+
+    document.addEventListener('click', event => {
+      const target = event.target.closest?.('[data-section="academy"], [href="#academy"], [onclick*="academy"]');
+      if (target) setTimeout(() => renderAcademyApplications(true), 120);
+    });
+
+    setInterval(() => renderAcademyApplications(true), 4000);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => start(), { once: true });
   else start();
 })();
