@@ -53,11 +53,16 @@
           gender: String(fd.get('gender') || ''),
           status: 'new'
         };
-        const { data, error } = await academyDb.from('academy_applications').insert(payload).select('id, created_at').single();
+
+        // Do not request the inserted row back here. Public applicants have INSERT permission,
+        // but not SELECT permission, and requesting RETURNING data causes an RLS failure.
+        const { error } = await academyDb.from('academy_applications').insert(payload);
         if (error) throw error;
+
         const { error: mailError } = await academyDb.functions.invoke('sent-academy-application-email', {
-          body: { ...payload, id: data?.id, created_at: data?.created_at, lang: tr() ? 'tr' : 'en' }
+          body: { ...payload, lang: tr() ? 'tr' : 'en' }
         });
+
         form.reset();
         if (mailError) {
           console.error('Academy confirmation email failed:', mailError);
