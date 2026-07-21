@@ -1,5 +1,6 @@
 (() => {
   const cfg = window.KH_SUPABASE || {};
+  let academyDb = null;
 
   const tr = () => (localStorage.getItem('siteLang') || 'tr') === 'tr';
   const text = (turkish, english) => tr() ? turkish : english;
@@ -22,28 +23,6 @@
       </select>`;
   }
 
-  async function submitApplication(payload) {
-    // Verify JWT is disabled for this public function, so no Authorization/apikey
-    // headers are needed. Omitting them avoids browser preflight/gateway failures.
-    const response = await fetch(`${cfg.url}/functions/v1/sent-academy-application-email`, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...payload, lang: tr() ? 'tr' : 'en' }),
-    });
-
-    let result = null;
-    try { result = await response.json(); } catch (_) {}
-
-    if (!response.ok || !result?.ok) {
-      const error = new Error(result?.error || `Application service failed (${response.status})`);
-      error.saved = Boolean(result?.saved);
-      throw error;
-    }
-
-    return result;
-  }
-
   function prepareForm(form) {
     if (!form || form.dataset.academyUpgraded === '1') return;
     form.dataset.academyUpgraded = '1';
@@ -59,7 +38,7 @@
       event.preventDefault();
       event.stopImmediatePropagation();
 
-      if (!cfg.url) {
+      if (!academyDb) {
         return alert(text('Bağlantı hazırlanıyor, tekrar deneyin.', 'Connection is being prepared, please try again.'));
       }
 
@@ -81,25 +60,20 @@
           height_cm: Number(fd.get('height_cm')),
           dominant_hand: String(fd.get('dominant_hand') || ''),
           gender: String(fd.get('gender') || ''),
+          status: 'new'
         };
 
-        await submitApplication(payload);
+        const { error } = await academyDb.from('academy_applications').insert(payload);
+        if (error) throw error;
+
         form.reset();
         alert(text(
-          'Başvurunuz alındı. E-postanıza teşekkür mesajı gönderildi.',
-          'Your application was received. A thank-you email was sent to you.'
+          'Başvurunuz alındı. Teşekkür e-postanız otomatik olarak gönderilecektir.',
+          'Your application was received. Your thank-you email will be sent automatically.'
         ));
       } catch (error) {
         console.error('Academy application failed:', error);
-        if (error?.saved) form.reset();
-        if (error?.saved) {
-          alert(text(
-            'Başvurunuz kaydedildi ancak teşekkür e-postası gönderilemedi: ',
-            'Your application was saved, but the thank-you email could not be sent: '
-          ) + (error?.message || String(error)));
-        } else {
-          alert(text('Başvuru gönderilemedi: ', 'Application could not be sent: ') + (error?.message || String(error)));
-        }
+        alert(text('Başvuru gönderilemedi: ', 'Application could not be sent: ') + (error?.message || String(error)));
       } finally {
         if (button) {
           button.disabled = false;
@@ -109,12 +83,17 @@
     }, true);
   }
 
-  function start() {
+  function start(attempt = 0) {
     const form = document.getElementById('academyForm');
-    if (!form) return;
+    if (!form || !cfg.url || !cfg.publishableKey) return;
+    if (!window.supabase) {
+      if (attempt < 40) setTimeout(() => start(attempt + 1), 250);
+      return;
+    }
+    academyDb = window.supabase.createClient(cfg.url, cfg.publishableKey);
     prepareForm(form);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => start(), { once: true });
   else start();
 })();
