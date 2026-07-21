@@ -23,6 +23,25 @@
       </select>`;
   }
 
+  async function sendConfirmationEmail(payload) {
+    const response = await fetch(`${cfg.url}/functions/v1/sent-academy-application-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': cfg.publishableKey,
+        'Authorization': `Bearer ${cfg.publishableKey}`
+      },
+      body: JSON.stringify({ ...payload, lang: tr() ? 'tr' : 'en' })
+    });
+
+    let result = null;
+    try { result = await response.json(); } catch (_) {}
+    if (!response.ok || !result?.ok) {
+      throw new Error(result?.error || `Email function failed (${response.status})`);
+    }
+    return result;
+  }
+
   function prepareForm(form) {
     if (!form || form.dataset.academyUpgraded === '1') return;
     form.dataset.academyUpgraded = '1';
@@ -54,21 +73,17 @@
           status: 'new'
         };
 
-        // Do not request the inserted row back here. Public applicants have INSERT permission,
-        // but not SELECT permission, and requesting RETURNING data causes an RLS failure.
         const { error } = await academyDb.from('academy_applications').insert(payload);
         if (error) throw error;
 
-        const { error: mailError } = await academyDb.functions.invoke('sent-academy-application-email', {
-          body: { ...payload, lang: tr() ? 'tr' : 'en' }
-        });
-
-        form.reset();
-        if (mailError) {
-          console.error('Academy confirmation email failed:', mailError);
-          alert(text('Başvurunuz alındı ancak teşekkür e-postası gönderilemedi.', 'Your application was received, but the thank-you email could not be sent.'));
-        } else {
+        try {
+          await sendConfirmationEmail(payload);
+          form.reset();
           alert(text('Başvurunuz alındı. E-postanıza teşekkür mesajı gönderildi.', 'Your application was received. A thank-you email was sent to you.'));
+        } catch (mailError) {
+          console.error('Academy confirmation email failed:', mailError);
+          form.reset();
+          alert(text('Başvurunuz alındı ancak teşekkür e-postası gönderilemedi: ', 'Your application was received, but the thank-you email could not be sent: ') + (mailError?.message || String(mailError)));
         }
       } catch (error) {
         alert(text('Başvuru gönderilemedi: ', 'Application could not be sent: ') + (error?.message || String(error)));
