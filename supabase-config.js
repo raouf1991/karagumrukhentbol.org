@@ -22,7 +22,7 @@ if (isMainAdmin) {
   document.head.appendChild(academyAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
   const academyUpgradeScript = document.createElement('script');
-  academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-server-submit1';
+  academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-public-cors2';
   academyUpgradeScript.defer = true;
   document.head.appendChild(academyUpgradeScript);
 }
