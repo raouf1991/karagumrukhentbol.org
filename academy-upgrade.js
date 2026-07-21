@@ -100,14 +100,19 @@
     }, true);
   }
 
-  function start() {
-    if (!window.supabase || !cfg.url || !cfg.publishableKey) return;
+  function start(attempt = 0) {
+    const form = document.getElementById('academyForm');
+    if (!form || !cfg.url || !cfg.publishableKey) return;
+    if (!window.supabase) {
+      if (attempt < 40) setTimeout(() => start(attempt + 1), 250);
+      return;
+    }
     academyDb = window.supabase.createClient(cfg.url, cfg.publishableKey);
-    prepareForm(document.getElementById('academyForm'));
+    prepareForm(form);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once: true });
+    document.addEventListener('DOMContentLoaded', () => start(), { once: true });
   } else {
     start();
   }
