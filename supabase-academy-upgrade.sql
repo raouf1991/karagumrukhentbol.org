@@ -32,11 +32,4 @@ for insert
 to anon, authenticated
 with check (status = 'new');
 
--- Logged-in administrators keep full management access.
-drop policy if exists "Authenticated manage academy applications" on public.academy_applications;
-create policy "Authenticated manage academy applications"
-on public.academy_applications
-for all
-to authenticated
-using (true)
-with check (true);
+-- Existing administrator SELECT / UPDATE / DELETE policies are intentionally preserved.
