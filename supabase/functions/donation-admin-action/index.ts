@@ -9,6 +9,7 @@ const corsHeaders={
 };
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...corsHeaders,'Content-Type':'application/json'}});
 const safe=(value:unknown)=>String(value??'').replace(/[<>&]/g,'');
+const titleCase=(value:string)=>value.trim().replace(/\s+/g,' ').split(' ').map(part=>part ? part.charAt(0).toLocaleUpperCase('tr-TR')+part.slice(1).toLocaleLowerCase('tr-TR') : '').join(' ');
 
 async function fetchBytes(url:string){
   const response=await fetch(url);
@@ -71,9 +72,11 @@ Deno.serve(async req=>{
     page.drawLine({start:{x:842,y:0},end:{x:625,y:0},thickness:30,color:black});
     page.drawLine({start:{x:842,y:22},end:{x:675,y:0},thickness:18,color:red});
 
-    const logoScale=Math.min(120/logo.width,105/logo.height);
+    // Dedicated white logo area prevents clipping and keeps the complete club mark visible.
+    page.drawRectangle({x:361,y:474,width:120,height:98,color:paper});
+    const logoScale=Math.min(94/logo.width,88/logo.height);
     const lw=logo.width*logoScale,lh=logo.height*logoScale;
-    page.drawImage(logo,{x:(W-lw)/2,y:470,width:lw,height:lh});
+    page.drawImage(logo,{x:(W-lw)/2,y:480+(88-lh)/2,width:lw,height:lh});
 
     const centerText=(text:string,y:number,size:number,font:any,color=black)=>{
       const width=font.widthOfTextAtSize(text,size);
@@ -85,16 +88,18 @@ Deno.serve(async req=>{
     centerText("Karagümrük Hentbol Spor Kulübü’ne göstermiş olduğunuz",355,15,regular,gray);
     centerText('değerli ilgi, katkı ve destekleriniz için',331,15,regular,gray);
 
-    let nameSize=44;
-    const donor=safe(a.full_name);
-    while(script.widthOfTextAtSize(donor,nameSize)>550&&nameSize>28) nameSize-=2;
-    centerText(donor,265,nameSize,script,black);
-    page.drawLine({start:{x:185,y:252},end:{x:657,y:252},thickness:1.2,color:red});
+    const donor=titleCase(safe(a.full_name));
+    let nameSize=42;
+    while(script.widthOfTextAtSize(donor,nameSize)>520&&nameSize>28) nameSize-=2;
+    const donorWidth=script.widthOfTextAtSize(donor,nameSize);
+    // Great Vibes has long ascenders and descenders, so the baseline is raised and extra vertical room is reserved.
+    page.drawText(donor,{x:(W-donorWidth)/2,y:272,size:nameSize,font:script,color:black});
+    page.drawLine({start:{x:170,y:250},end:{x:672,y:250},thickness:1.2,color:red});
 
-    centerText('Kulübümüze sunduğunuz değerli destek, gençlerimizin sporla',218,14,regular,gray);
-    centerText('yetişmesine, hedeflerine ulaşmasına ve topluma faydalı bireyler',195,14,regular,gray);
-    centerText('olarak geleceğe hazırlanmasına büyük güç katmaktadır.',172,14,regular,gray);
-    centerText('Katkılarınız için teşekkür eder, şükranlarımızı sunarız.',137,14,bold,black);
+    centerText('Kulübümüze sunduğunuz değerli destek, gençlerimizin sporla',214,14,regular,gray);
+    centerText('yetişmesine, hedeflerine ulaşmasına ve topluma faydalı bireyler',191,14,regular,gray);
+    centerText('olarak geleceğe hazırlanmasına büyük güç katmaktadır.',168,14,regular,gray);
+    centerText('Katkılarınız için teşekkür eder, şükranlarımızı sunarız.',133,14,bold,black);
 
     const date=new Date().toLocaleDateString('tr-TR');
     page.drawText('Tarih',{x:92,y:75,size:11,font:bold,color:black});
@@ -102,7 +107,11 @@ Deno.serve(async req=>{
     page.drawText(date,{x:91,y:51,size:11,font:regular,color:gray});
     centerText('Karagümrük Hentbol Spor Kulübü',65,11,regular,black);
     centerText('İstanbul',48,10,regular,gray);
-    page.drawText('Raouf Tarek',{x:635,y:83,size:25,font:script,color:black});
+
+    const signature='Raouf Tarek';
+    const signatureSize=24;
+    const signatureWidth=script.widthOfTextAtSize(signature,signatureSize);
+    page.drawText(signature,{x:696-signatureWidth/2,y:91,size:signatureSize,font:script,color:black});
     page.drawLine({start:{x:622,y:76},end:{x:770,y:76},thickness:1.1,color:red});
     page.drawText('Raouf Tarek',{x:650,y:56,size:12,font:bold,color:red});
     page.drawText('Kulüp Başkanı',{x:655,y:39,size:10,font:regular,color:black});
