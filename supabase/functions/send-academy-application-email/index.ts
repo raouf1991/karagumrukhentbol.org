@@ -33,6 +33,7 @@ Deno.serve(async (req) => {
   try {
     const data = await req.json();
     const lang = data.lang === 'en' ? 'en' : 'tr';
+    const emailOnly = data.email_only === true;
 
     const application = {
       full_name: String(data.full_name || '').trim(),
@@ -55,24 +56,30 @@ Deno.serve(async (req) => {
     if (!['right', 'left', 'both'].includes(application.dominant_hand)) throw new Error('Dominant hand is invalid.');
     if (!['male', 'female'].includes(application.gender)) throw new Error('Gender is invalid.');
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const apiKey = Deno.env.get('RESEND_API_KEY');
     const from = Deno.env.get('RESEND_FROM_EMAIL');
-    if (!supabaseUrl || !serviceRoleKey) throw new Error('Supabase server secrets are missing.');
     if (!apiKey || !from) throw new Error('Resend secrets are missing.');
 
-    const adminDb = createClient(supabaseUrl, serviceRoleKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    let applicationId: string | undefined;
 
-    const { data: inserted, error: insertError } = await adminDb
-      .from('academy_applications')
-      .insert(application)
-      .select('id, created_at')
-      .single();
+    if (!emailOnly) {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      if (!supabaseUrl || !serviceRoleKey) throw new Error('Supabase server secrets are missing.');
 
-    if (insertError) throw new Error(`Application could not be saved: ${insertError.message}`);
+      const adminDb = createClient(supabaseUrl, serviceRoleKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+
+      const { data: inserted, error: insertError } = await adminDb
+        .from('academy_applications')
+        .insert(application)
+        .select('id')
+        .single();
+
+      if (insertError) throw new Error(`Application could not be saved: ${insertError.message}`);
+      applicationId = inserted?.id;
+    }
 
     const subject = lang === 'en'
       ? 'Thank you for choosing Karagümrük Handball Academy'
@@ -111,19 +118,11 @@ Deno.serve(async (req) => {
     });
 
     const emailResult = await emailResponse.json();
-    if (!emailResponse.ok) {
-      console.error('Academy email failed after application insert:', emailResult);
-      return jsonResponse({
-        ok: false,
-        saved: true,
-        application_id: inserted?.id,
-        error: emailResult?.message || 'Application was saved, but email could not be sent.',
-      }, 502);
-    }
+    if (!emailResponse.ok) throw new Error(emailResult?.message || 'Email could not be sent.');
 
-    return jsonResponse({ ok: true, saved: true, application_id: inserted?.id, email: emailResult });
+    return jsonResponse({ ok: true, saved: !emailOnly, application_id: applicationId, email: emailResult });
   } catch (error) {
     console.error('Academy application error:', error);
-    return jsonResponse({ ok: false, saved: false, error: error instanceof Error ? error.message : String(error) }, 400);
+    return jsonResponse({ ok: false, error: error instanceof Error ? error.message : String(error) }, 400);
   }
 });
