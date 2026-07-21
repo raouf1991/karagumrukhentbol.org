@@ -22,7 +22,7 @@ if (isMainAdmin) {
   document.head.appendChild(academyAdminScript);
 
   const donationAdminScript = document.createElement('script');
-  donationAdminScript.src = 'admin-donations.js?v=20260721-1';
+  donationAdminScript.src = 'admin-donations.js?v=20260721-3';
   donationAdminScript.defer = true;
   document.head.appendChild(donationAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
