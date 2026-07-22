@@ -3,8 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Karagümrük Hentbol Spor Kulübü haberleri">
-  <title>Haber | Karagümrük Hentbol</title>
+  <meta name="description" content="Karagümrük Hentbol Spor Kulübü resmi haberleri, duyuruları ve takım gelişmeleri.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+  <link rel="canonical" href="https://karagumrukhentbol.org/news.html">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#e10600">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Karagümrük Hentbol Spor Kulübü">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:title" content="Haberler | Karagümrük Hentbol Spor Kulübü">
+  <meta property="og:description" content="Kulübün en güncel haberleri ve resmi duyuruları.">
+  <meta property="og:url" content="https://karagumrukhentbol.org/news.html">
+  <meta property="og:image" content="https://karagumrukhentbol.org/assets/club-logo.png">
+  <meta property="og:image:alt" content="Karagümrük Hentbol Spor Kulübü logosu">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Haberler | Karagümrük Hentbol Spor Kulübü">
+  <meta name="twitter:description" content="Kulübün en güncel haberleri ve resmi duyuruları.">
+  <meta name="twitter:image" content="https://karagumrukhentbol.org/assets/club-logo.png">
+  <title>Haberler | Karagümrük Hentbol Spor Kulübü</title>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Karagümrük Hentbol Haberleri","description":"Karagümrük Hentbol Spor Kulübü resmi haberleri ve duyuruları","url":"https://karagumrukhentbol.org/news.html","about":{"@type":"SportsOrganization","name":"Karagümrük Hentbol Spor Kulübü","url":"https://karagumrukhentbol.org/"}}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,15 +47,16 @@
   if(error||!n)return fail();
   const title=lang==='tr'?(n.title_tr||''):(n.title_en||n.title_tr||'');
   const body=lang==='tr'?(n.body_tr||''):(n.body_en||n.body_tr||'');
-  const date=new Date(n.published_at||n.created_at||Date.now()).toLocaleDateString(lang==='tr'?'tr-TR':'en-GB',{year:'numeric',month:'long',day:'numeric'});
+  const iso=new Date(n.published_at||n.created_at||Date.now()).toISOString();
+  const date=new Date(iso).toLocaleDateString(lang==='tr'?'tr-TR':'en-GB',{year:'numeric',month:'long',day:'numeric'});
   document.title=title+' | Karagümrük Hentbol';
   document.querySelector('meta[name=description]').content=body.replace(/\s+/g,' ').slice(0,155);
   const shareUrl=`${location.origin}/share/news?id=${encodeURIComponent(id)}&lang=${lang}`;
   const share=encodeURIComponent(shareUrl),shareText=encodeURIComponent(title);
-  document.getElementById('page').innerHTML=`<section class="hero"><div class="wrap"><span class="kicker">${lang==='tr'?'Kulüpten Haberler':'Club News'}</span><h1>${esc(title)}</h1><time class="date">${esc(date)}</time></div></section><article class="article">${n.image_url?`<img class="cover" src="${esc(n.image_url)}" alt="${esc(title)}">`:''}<div class="content"><p>${esc(body)}</p><div class="actions"><a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/?text=${shareText}%20${share}">${lang==='tr'?'WhatsApp’ta Paylaş':'Share on WhatsApp'}</a><button class="btn dark" id="copyBtn">${lang==='tr'?'Paylaşım Bağlantısını Kopyala':'Copy Share Link'}</button></div></div></article><section class="wrap related"><h2>${lang==='tr'?'Diğer Haberler':'Other News'}</h2><div class="grid" id="related"></div></section>`;
+  document.getElementById('page').innerHTML=`<section class="hero"><div class="wrap"><span class="kicker">${lang==='tr'?'Kulüpten Haberler':'Club News'}</span><h1>${esc(title)}</h1><time class="date" datetime="${iso}">${esc(date)}</time></div></section><article class="article">${n.image_url?`<img class="cover" src="${esc(n.image_url)}" alt="${esc(title)}">`:''}<div class="content"><p>${esc(body)}</p><div class="actions"><a class="btn primary" target="_blank" rel="noopener noreferrer" href="https://wa.me/?text=${shareText}%20${share}">${lang==='tr'?'WhatsApp’ta Paylaş':'Share on WhatsApp'}</a><a class="btn dark" target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/sharer/sharer.php?u=${share}">Facebook</a><a class="btn dark" target="_blank" rel="noopener noreferrer" href="https://twitter.com/intent/tweet?text=${shareText}&url=${share}">X</a><a class="btn dark" target="_blank" rel="noopener noreferrer" href="https://t.me/share/url?url=${share}&text=${shareText}">Telegram</a><button class="btn dark" id="copyBtn">${lang==='tr'?'Paylaşım Bağlantısını Kopyala':'Copy Share Link'}</button></div></div></article><section class="wrap related"><h2>${lang==='tr'?'Diğer Haberler':'Other News'}</h2><div class="grid" id="related"></div></section>`;
   document.getElementById('copyBtn').onclick=async()=>{await navigator.clipboard.writeText(shareUrl);alert(lang==='tr'?'Başlık ve görselli paylaşım bağlantısı kopyalandı.':'Share link with title and image copied.');};
   const {data:more}=await db.from('news').select('id,title_tr,title_en,image_url,published_at,created_at').eq('published',true).neq('id',id).order('published_at',{ascending:false}).limit(3);
-  const g=document.getElementById('related');g.innerHTML=(more||[]).map(x=>{const t=lang==='tr'?(x.title_tr||''):(x.title_en||x.title_tr||'');return `<a class="card" href="news.html?id=${encodeURIComponent(x.id)}">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(t)}">`:'<span class="placeholder"></span>'}<div><h3>${esc(t)}</h3></div></a>`}).join('');
+  const g=document.getElementById('related');g.innerHTML=(more||[]).map(x=>{const t=lang==='tr'?(x.title_tr||''):(x.title_en||x.title_tr||'');return `<a class="card" href="news.html?id=${encodeURIComponent(x.id)}">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(t)}" loading="lazy">`:'<span class="placeholder"></span>'}<div><h3>${esc(t)}</h3></div></a>`}).join('');
  }
  function fail(){document.getElementById('page').innerHTML=`<div class="status"><strong>${lang==='tr'?'Haber bulunamadı.':'News not found.'}</strong><br><br><a href="index.html#news">${lang==='tr'?'Ana sayfaya dön':'Return home'}</a></div>`;}
  run().catch(fail);
