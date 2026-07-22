@@ -25,6 +25,11 @@ if (isMainAdmin) {
   donationAdminScript.src = 'admin-donations.js?v=20260721-3';
   donationAdminScript.defer = true;
   document.head.appendChild(donationAdminScript);
+
+  const ticketAdminScript = document.createElement('script');
+  ticketAdminScript.src = 'admin-tickets.js?v=20260722-1';
+  ticketAdminScript.defer = true;
+  document.head.appendChild(ticketAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
   const academyUpgradeScript = document.createElement('script');
   academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-public-cors2';
@@ -35,4 +40,9 @@ if (isMainAdmin) {
   donationUpgradeScript.src = 'donation-upgrade.js?v=20260721-1';
   donationUpgradeScript.defer = true;
   document.head.appendChild(donationUpgradeScript);
+
+  const ticketUpgradeScript = document.createElement('script');
+  ticketUpgradeScript.src = 'tickets-upgrade.js?v=20260722-1';
+  ticketUpgradeScript.defer = true;
+  document.head.appendChild(ticketUpgradeScript);
 }
