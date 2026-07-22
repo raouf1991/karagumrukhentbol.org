@@ -27,7 +27,7 @@ if (isMainAdmin) {
   document.head.appendChild(donationAdminScript);
 
   const ticketAdminScript = document.createElement('script');
-  ticketAdminScript.src = 'admin-tickets.js?v=20260722-1';
+  ticketAdminScript.src = 'admin-tickets.js?v=20260722-2';
   ticketAdminScript.defer = true;
   document.head.appendChild(ticketAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
