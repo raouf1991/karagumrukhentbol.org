@@ -31,6 +31,11 @@ if (isMainAdmin) {
   ticketAdminScript.defer = true;
   document.head.appendChild(ticketAdminScript);
 } else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
+  const seoUpgradeScript = document.createElement('script');
+  seoUpgradeScript.src = 'seo-upgrade.js?v=20260722-1';
+  seoUpgradeScript.defer = true;
+  document.head.appendChild(seoUpgradeScript);
+
   const academyUpgradeScript = document.createElement('script');
   academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-public-cors2';
   academyUpgradeScript.defer = true;
