@@ -22,14 +22,14 @@ jobs:
         with:
           node-version: '20'
       - run: node scripts/generate-news-pages.mjs
-      - name: Commit generated pages
+      - name: Commit generated pages and sitemap
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add news
+          git add news sitemap.xml
           if git diff --cached --quiet; then
-            echo "No news page changes"
+            echo "No SEO page changes"
           else
-            git commit -m "Update static news pages"
+            git commit -m "Update static news pages and sitemap"
             git push
           fi
