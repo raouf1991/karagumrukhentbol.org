@@ -50,4 +50,9 @@ if (isMainAdmin) {
   newsUpgradeScript.src = 'news-upgrade.js?v=20260722-1';
   newsUpgradeScript.defer = true;
   document.head.appendChild(newsUpgradeScript);
+
+  const staticNewsLinksScript = document.createElement('script');
+  staticNewsLinksScript.src = 'static-news-links.js?v=20260722-1';
+  staticNewsLinksScript.defer = true;
+  document.head.appendChild(staticNewsLinksScript);
 }
