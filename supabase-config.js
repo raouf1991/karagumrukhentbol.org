@@ -30,34 +30,41 @@ if (isMainAdmin) {
   ticketAdminScript.src = 'admin-tickets.js?v=20260722-2';
   ticketAdminScript.defer = true;
   document.head.appendChild(ticketAdminScript);
-} else if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
-  const seoUpgradeScript = document.createElement('script');
-  seoUpgradeScript.src = 'seo-upgrade.js?v=20260722-1';
-  seoUpgradeScript.defer = true;
-  document.head.appendChild(seoUpgradeScript);
+} else {
+  const performanceScript = document.createElement('script');
+  performanceScript.src = 'performance-upgrade.js?v=20260722-1';
+  performanceScript.defer = true;
+  document.head.appendChild(performanceScript);
 
-  const academyUpgradeScript = document.createElement('script');
-  academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-public-cors2';
-  academyUpgradeScript.defer = true;
-  document.head.appendChild(academyUpgradeScript);
+  if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
+    const seoUpgradeScript = document.createElement('script');
+    seoUpgradeScript.src = 'seo-upgrade.js?v=20260722-1';
+    seoUpgradeScript.defer = true;
+    document.head.appendChild(seoUpgradeScript);
 
-  const donationUpgradeScript = document.createElement('script');
-  donationUpgradeScript.src = 'donation-upgrade.js?v=20260721-1';
-  donationUpgradeScript.defer = true;
-  document.head.appendChild(donationUpgradeScript);
+    const academyUpgradeScript = document.createElement('script');
+    academyUpgradeScript.src = 'academy-upgrade.js?v=20260721-public-cors2';
+    academyUpgradeScript.defer = true;
+    document.head.appendChild(academyUpgradeScript);
 
-  const ticketUpgradeScript = document.createElement('script');
-  ticketUpgradeScript.src = 'tickets-upgrade.js?v=20260722-1';
-  ticketUpgradeScript.defer = true;
-  document.head.appendChild(ticketUpgradeScript);
+    const donationUpgradeScript = document.createElement('script');
+    donationUpgradeScript.src = 'donation-upgrade.js?v=20260721-1';
+    donationUpgradeScript.defer = true;
+    document.head.appendChild(donationUpgradeScript);
 
-  const newsUpgradeScript = document.createElement('script');
-  newsUpgradeScript.src = 'news-upgrade.js?v=20260722-1';
-  newsUpgradeScript.defer = true;
-  document.head.appendChild(newsUpgradeScript);
+    const ticketUpgradeScript = document.createElement('script');
+    ticketUpgradeScript.src = 'tickets-upgrade.js?v=20260722-1';
+    ticketUpgradeScript.defer = true;
+    document.head.appendChild(ticketUpgradeScript);
 
-  const staticNewsLinksScript = document.createElement('script');
-  staticNewsLinksScript.src = 'static-news-links.js?v=20260722-1';
-  staticNewsLinksScript.defer = true;
-  document.head.appendChild(staticNewsLinksScript);
+    const newsUpgradeScript = document.createElement('script');
+    newsUpgradeScript.src = 'news-upgrade.js?v=20260722-1';
+    newsUpgradeScript.defer = true;
+    document.head.appendChild(newsUpgradeScript);
+
+    const staticNewsLinksScript = document.createElement('script');
+    staticNewsLinksScript.src = 'static-news-links.js?v=20260722-1';
+    staticNewsLinksScript.defer = true;
+    document.head.appendChild(staticNewsLinksScript);
+  }
 }
