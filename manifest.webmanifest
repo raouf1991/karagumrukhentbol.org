@@ -1,0 +1,19 @@
+{
+  "name": "Karagümrük Hentbol Spor Kulübü",
+  "short_name": "Karagümrük Hentbol",
+  "description": "Karagümrük Hentbol Spor Kulübü resmi web sitesi",
+  "lang": "tr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#e10600",
+  "icons": [
+    {
+      "src": "/assets/club-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
