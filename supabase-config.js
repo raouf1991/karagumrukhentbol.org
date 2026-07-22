@@ -45,4 +45,9 @@ if (isMainAdmin) {
   ticketUpgradeScript.src = 'tickets-upgrade.js?v=20260722-1';
   ticketUpgradeScript.defer = true;
   document.head.appendChild(ticketUpgradeScript);
+
+  const newsUpgradeScript = document.createElement('script');
+  newsUpgradeScript.src = 'news-upgrade.js?v=20260722-1';
+  newsUpgradeScript.defer = true;
+  document.head.appendChild(newsUpgradeScript);
 }
