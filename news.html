@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Karagümrük Hentbol Spor Kulübü haberleri">
+  <title>Haber | Karagümrük Hentbol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f3f4f6;color:#151515;font-family:Inter,Arial,sans-serif}.topbar{background:#111;color:#fff}.wrap{width:min(1040px,calc(100% - 32px));margin:auto}.nav{min-height:84px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:14px;color:#fff;text-decoration:none;font:800 24px 'Barlow Condensed',sans-serif}.brand img{width:64px;height:64px;object-fit:contain;background:#fff;border-radius:50%}.back{color:#fff;text-decoration:none;font-weight:700}.hero{background:linear-gradient(135deg,#111 0%,#2a0000 100%);padding:55px 0 105px;color:#fff}.kicker{display:block;color:#ff3933;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:12px}.hero h1{font:800 clamp(38px,7vw,72px)/.98 'Barlow Condensed',sans-serif;margin:0;max-width:900px}.date{display:block;margin-top:22px;color:#ddd}.article{width:min(900px,calc(100% - 32px));margin:-62px auto 60px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 60px #0002}.cover{width:100%;max-height:520px;object-fit:cover;display:block;background:#222}.content{padding:clamp(24px,5vw,56px)}.content p{white-space:pre-wrap;font-size:18px;line-height:1.85;margin:0;color:#292929}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:38px;padding-top:24px;border-top:1px solid #ddd}.btn{display:inline-flex;align-items:center;justify-content:center;padding:13px 18px;border-radius:8px;text-decoration:none;font-weight:800;border:0;cursor:pointer}.primary{background:#e10600;color:#fff}.dark{background:#111;color:#fff}.related{margin-top:50px}.related h2{font:800 34px 'Barlow Condensed',sans-serif}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 25px #0001;text-decoration:none;color:inherit}.card img,.placeholder{height:160px;width:100%;object-fit:cover;background:#222;display:block}.card div:last-child{padding:16px}.card h3{font:700 23px 'Barlow Condensed',sans-serif;margin:0}.status{text-align:center;padding:80px 20px;font-size:20px}@media(max-width:760px){.grid{grid-template-columns:1fr}.hero{padding-bottom:85px}.nav{min-height:72px}.brand span{display:none}}
+  </style>
+</head>
+<body>
+<header class="topbar"><div class="wrap nav"><a class="brand" href="index.html"><img src="assets/club-logo.png" alt="Karagümrük Hentbol"><span>KARAGÜMRÜK HENTBOL</span></a><a class="back" href="index.html#news">← <span id="backText">Haberlere Dön</span></a></div></header>
+<main id="page"><div class="status">Haber yükleniyor...</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js?v=20260722-news1"></script>
+<script>
+(()=>{
+ const cfg=window.KH_SUPABASE||{},lang=localStorage.getItem('siteLang')||'tr';
+ document.documentElement.lang=lang;document.getElementById('backText').textContent=lang==='tr'?'Haberlere Dön':'Back to News';
+ const esc=(v='')=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const id=new URLSearchParams(location.search).get('id');
+ async function run(){
+  if(!id||!cfg.url||!cfg.publishableKey){return fail();}
+  const db=window.supabase.createClient(cfg.url,cfg.publishableKey);
+  const {data:n,error}=await db.from('news').select('*').eq('id',id).eq('published',true).maybeSingle();
+  if(error||!n)return fail();
+  const title=lang==='tr'?(n.title_tr||''):(n.title_en||n.title_tr||'');
+  const body=lang==='tr'?(n.body_tr||''):(n.body_en||n.body_tr||'');
+  const date=new Date(n.published_at||n.created_at||Date.now()).toLocaleDateString(lang==='tr'?'tr-TR':'en-GB',{year:'numeric',month:'long',day:'numeric'});
+  document.title=title+' | Karagümrük Hentbol';
+  document.querySelector('meta[name=description]').content=body.replace(/\s+/g,' ').slice(0,155);
+  const share=encodeURIComponent(location.href),shareText=encodeURIComponent(title);
+  document.getElementById('page').innerHTML=`<section class="hero"><div class="wrap"><span class="kicker">${lang==='tr'?'Kulüpten Haberler':'Club News'}</span><h1>${esc(title)}</h1><time class="date">${esc(date)}</time></div></section><article class="article">${n.image_url?`<img class="cover" src="${esc(n.image_url)}" alt="${esc(title)}">`:''}<div class="content"><p>${esc(body)}</p><div class="actions"><a class="btn primary" target="_blank" rel="noopener" href="https://wa.me/?text=${shareText}%20${share}">${lang==='tr'?'WhatsApp’ta Paylaş':'Share on WhatsApp'}</a><button class="btn dark" id="copyBtn">${lang==='tr'?'Bağlantıyı Kopyala':'Copy Link'}</button></div></div></article><section class="wrap related"><h2>${lang==='tr'?'Diğer Haberler':'Other News'}</h2><div class="grid" id="related"></div></section>`;
+  document.getElementById('copyBtn').onclick=async()=>{await navigator.clipboard.writeText(location.href);alert(lang==='tr'?'Bağlantı kopyalandı.':'Link copied.');};
+  const {data:more}=await db.from('news').select('id,title_tr,title_en,image_url,published_at,created_at').eq('published',true).neq('id',id).order('published_at',{ascending:false}).limit(3);
+  const g=document.getElementById('related');g.innerHTML=(more||[]).map(x=>{const t=lang==='tr'?(x.title_tr||''):(x.title_en||x.title_tr||'');return `<a class="card" href="news.html?id=${encodeURIComponent(x.id)}">${x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(t)}">`:'<span class="placeholder"></span>'}<div><h3>${esc(t)}</h3></div></a>`}).join('');
+ }
+ function fail(){document.getElementById('page').innerHTML=`<div class="status"><strong>${lang==='tr'?'Haber bulunamadı.':'News not found.'}</strong><br><br><a href="index.html#news">${lang==='tr'?'Ana sayfaya dön':'Return home'}</a></div>`;}
+ run().catch(fail);
+})();
+</script>
+</body>
+</html>
