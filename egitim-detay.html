@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Karagümrük Hentbol Eğitim Merkezi eğitim içeriği.">
+  <title>Eğitim Detayı | Karagümrük Hentbol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260720-store1">
+  <style>
+    :root{--edu-red:#b11226;--edu-dark:#101114;--edu-soft:#f4f5f7;--edu-line:#e4e6ea}
+    body{background:var(--edu-soft)}
+    .detail-hero{background:linear-gradient(125deg,#101114 0%,#1d1f24 62%,#7c0d1b 100%);color:#fff;padding:68px 0 54px}
+    .detail-breadcrumb{display:flex;gap:8px;flex-wrap:wrap;color:#d9dbe0;font-size:.9rem;margin-bottom:22px}
+    .detail-breadcrumb a{color:#fff;text-decoration:none;font-weight:700}
+    .detail-hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:42px;align-items:center}
+    .detail-kicker{display:inline-flex;align-items:center;gap:8px;color:#ffccd2;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+    .detail-hero h1{font-family:"Barlow Condensed",sans-serif;font-size:clamp(2.8rem,7vw,5.4rem);line-height:.92;margin:14px 0 18px}
+    .detail-summary{color:#e5e6e9;line-height:1.75;font-size:1.06rem;max-width:760px}
+    .detail-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+    .detail-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:9px 13px;font-weight:700;font-size:.88rem}
+    .detail-cover{aspect-ratio:16/10;border-radius:20px;background:linear-gradient(135deg,#25272d,#820f20);display:grid;place-items:center;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28);font-size:4rem}
+    .detail-cover img{width:100%;height:100%;object-fit:cover}
+    .detail-main{padding:48px 0 80px}
+    .detail-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:28px;align-items:start}
+    .detail-panel,.detail-side{background:#fff;border:1px solid var(--edu-line);border-radius:18px;box-shadow:0 12px 34px rgba(20,21,25,.06)}
+    .detail-panel{padding:26px}
+    .detail-panel h2,.detail-panel h3,.detail-side h3{font-family:"Barlow Condensed",sans-serif;color:var(--edu-dark)}
+    .detail-panel h2{font-size:2.35rem;margin:0 0 14px}.detail-panel h3{font-size:1.75rem;margin:30px 0 12px}
+    .detail-panel p{color:#5d6066;line-height:1.8}
+    .detail-player{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#111}
+    .detail-video-file{width:100%;border-radius:14px;background:#111;max-height:620px}
+    .detail-files{display:grid;gap:12px}
+    .detail-file{display:flex;justify-content:space-between;align-items:center;gap:18px;border:1px solid var(--edu-line);border-radius:14px;padding:15px}
+    .detail-file small{color:#72757b}.detail-file a{text-decoration:none;white-space:nowrap}
+    .detail-side{padding:21px;position:sticky;top:92px}
+    .detail-side h3{font-size:1.55rem;margin:0 0 15px}
+    .detail-fact{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid #eceef1;color:#62656b}
+    .detail-fact strong{color:#202126;text-align:right}
+    .detail-back{display:block;text-align:center;margin-top:18px;text-decoration:none}
+    .detail-empty{text-align:center;border:1px dashed #cfd2d8;border-radius:14px;padding:42px 18px;color:#6a6d73}
+    .detail-loading{min-height:320px;display:grid;place-items:center;text-align:center;color:#666}
+    @media(max-width:900px){.detail-hero-grid,.detail-layout{grid-template-columns:1fr}.detail-cover{max-width:620px}.detail-side{position:static}}
+    @media(max-width:620px){.detail-hero{padding-top:48px}.detail-panel{padding:18px}.detail-file{align-items:flex-start;flex-direction:column}.detail-file a{width:100%;text-align:center}}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a href="index.html" class="brand"><img src="assets/club-logo.png" alt="Karagümrük Hentbol logo"></a>
+    <button class="menu-toggle" aria-label="Menüyü aç">☰</button>
+    <nav class="main-nav">
+      <a href="index.html">Ana Sayfa</a><a href="index.html#club">Kulüp</a><a href="index.html#team">Takım</a><a href="index.html#matches">Maçlar</a><a href="news.html">Haberler</a><a href="index.html#academy">Akademi</a><a href="egitim-merkezi.html" class="active">Eğitim Merkezi</a><a href="store.html">Mağaza</a>
+    </nav>
+  </div>
+</header>
+<main id="detailRoot">
+  <div class="detail-loading"><div><strong>İçerik yükleniyor...</strong><br>Lütfen kısa bir süre bekleyin.</div></div>
+</main>
+<footer class="site-footer"><div class="container"><p>© Karagümrük Hentbol Spor Kulübü</p></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="egitim-detay.js?v=20260724-1"></script>
+</body>
+</html>
