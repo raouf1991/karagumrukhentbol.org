@@ -36,6 +36,11 @@ if (isMainAdmin) {
   performanceScript.defer = true;
   document.head.appendChild(performanceScript);
 
+  const educationNavScript = document.createElement('script');
+  educationNavScript.src = 'education-nav.js?v=20260724-1';
+  educationNavScript.defer = true;
+  document.head.appendChild(educationNavScript);
+
   if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
     const seoUpgradeScript = document.createElement('script');
     seoUpgradeScript.src = 'seo-upgrade.js?v=20260722-1';
