@@ -30,6 +30,11 @@ if (isMainAdmin) {
   ticketAdminScript.src = 'admin-tickets.js?v=20260722-2';
   ticketAdminScript.defer = true;
   document.head.appendChild(ticketAdminScript);
+
+  const educationAdminScript = document.createElement('script');
+  educationAdminScript.src = 'admin-education.js?v=20260724-2';
+  educationAdminScript.defer = true;
+  document.head.appendChild(educationAdminScript);
 } else {
   const performanceScript = document.createElement('script');
   performanceScript.src = 'performance-upgrade.js?v=20260722-1';
