@@ -6,35 +6,21 @@ window.KH_SUPABASE = {
 const isMainAdmin = /\/admin(?:\.html)?$/.test(location.pathname) || location.pathname.endsWith('/admin.html');
 
 if (isMainAdmin) {
-  const approvalScript = document.createElement('script');
-  approvalScript.src = 'admin-membership-approval.js?v=20260720-membership-card2';
-  approvalScript.defer = true;
-  document.head.appendChild(approvalScript);
+  const loadAdminScript = (src, marker) => {
+    if (document.querySelector(`script[data-admin-loader="${marker}"]`)) return;
+    const script = document.createElement('script');
+    script.src = `${src}${src.includes('?') ? '&' : '?'}cb=20260724-edu4`;
+    script.defer = true;
+    script.dataset.adminLoader = marker;
+    document.head.appendChild(script);
+  };
 
-  const playerProfilesLinkScript = document.createElement('script');
-  playerProfilesLinkScript.src = 'admin-player-profiles-link.js?v=20260721-1';
-  playerProfilesLinkScript.defer = true;
-  document.head.appendChild(playerProfilesLinkScript);
-
-  const academyAdminScript = document.createElement('script');
-  academyAdminScript.src = 'admin-academy.js?v=20260721-sync3';
-  academyAdminScript.defer = true;
-  document.head.appendChild(academyAdminScript);
-
-  const donationAdminScript = document.createElement('script');
-  donationAdminScript.src = 'admin-donations.js?v=20260721-3';
-  donationAdminScript.defer = true;
-  document.head.appendChild(donationAdminScript);
-
-  const ticketAdminScript = document.createElement('script');
-  ticketAdminScript.src = 'admin-tickets.js?v=20260722-2';
-  ticketAdminScript.defer = true;
-  document.head.appendChild(ticketAdminScript);
-
-  const educationAdminScript = document.createElement('script');
-  educationAdminScript.src = 'admin-education.js?v=20260724-2';
-  educationAdminScript.defer = true;
-  document.head.appendChild(educationAdminScript);
+  loadAdminScript('admin-membership-approval.js?v=20260720-membership-card2', 'membership-approval');
+  loadAdminScript('admin-player-profiles-link.js?v=20260724-edu4', 'player-profiles');
+  loadAdminScript('admin-academy.js?v=20260721-sync3', 'academy');
+  loadAdminScript('admin-donations.js?v=20260721-3', 'donations');
+  loadAdminScript('admin-tickets.js?v=20260724-edu4', 'tickets');
+  loadAdminScript('admin-education.js?v=20260724-edu4', 'education');
 } else {
   const performanceScript = document.createElement('script');
   performanceScript.src = 'performance-upgrade.js?v=20260722-1';
