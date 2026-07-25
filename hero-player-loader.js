@@ -22,5 +22,5 @@
     heroVisual.appendChild(image);
   };
   image.onerror = () => console.error('Final hero player artwork could not be loaded.');
-  image.src = 'assets/hero-player-final.svg?v=20260725-final1';
+  image.src = 'assets/hero-player-final.svg?v=20260725-final2';
 })();
