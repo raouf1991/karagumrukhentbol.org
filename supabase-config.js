@@ -38,6 +38,11 @@ if (isMainAdmin) {
     heroPlayerScript.defer = true;
     document.head.appendChild(heroPlayerScript);
 
+    const contactUpgradeScript = document.createElement('script');
+    contactUpgradeScript.src = 'contact-upgrade.js?v=20260725-1';
+    contactUpgradeScript.defer = true;
+    document.head.appendChild(contactUpgradeScript);
+
     const seoUpgradeScript = document.createElement('script');
     seoUpgradeScript.src = 'seo-upgrade.js?v=20260722-1';
     seoUpgradeScript.defer = true;
