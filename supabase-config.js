@@ -33,6 +33,11 @@ if (isMainAdmin) {
   document.head.appendChild(educationNavScript);
 
   if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
+    const heroPlayerScript = document.createElement('script');
+    heroPlayerScript.src = 'hero-player-loader.js?v=20260725-1';
+    heroPlayerScript.defer = true;
+    document.head.appendChild(heroPlayerScript);
+
     const seoUpgradeScript = document.createElement('script');
     seoUpgradeScript.src = 'seo-upgrade.js?v=20260722-1';
     seoUpgradeScript.defer = true;
