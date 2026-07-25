@@ -34,7 +34,7 @@ if (isMainAdmin) {
 
   if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
     const heroPlayerScript = document.createElement('script');
-    heroPlayerScript.src = 'hero-player-loader.js?v=20260725-final1';
+    heroPlayerScript.src = 'hero-player-loader.js?v=20260725-final2';
     heroPlayerScript.defer = true;
     document.head.appendChild(heroPlayerScript);
 
