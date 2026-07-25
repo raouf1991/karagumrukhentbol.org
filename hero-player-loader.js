@@ -14,19 +14,23 @@
   `;
   document.head.appendChild(style);
 
-  fetch('assets/hero-player.webp?v=20260725-1', { cache: 'no-store' })
+  fetch('assets/hero-player.webp?v=20260725-4', { cache: 'reload' })
     .then(response => {
       if (!response.ok) throw new Error(`Hero artwork could not be loaded (${response.status})`);
       return response.text();
     })
     .then(base64 => {
+      const cleanBase64 = base64.replace(/\s+/g, '');
       const image = new Image();
       image.className = 'hero-player-picture';
       image.alt = 'Karagümrük Hentbol 77 numaralı oyuncu';
       image.decoding = 'async';
-      image.src = `data:image/webp;base64,${base64.trim()}`;
-      heroVisual.classList.add('hero-player-art');
-      heroVisual.appendChild(image);
+      image.onload = () => {
+        heroVisual.classList.add('hero-player-art');
+        heroVisual.appendChild(image);
+      };
+      image.onerror = () => console.error('Hero artwork data could not be decoded.');
+      image.src = `data:image/webp;base64,${cleanBase64}`;
     })
     .catch(error => console.error(error));
 })();
