@@ -39,7 +39,7 @@ if (isMainAdmin) {
     document.head.appendChild(heroPlayerScript);
 
     const contactUpgradeScript = document.createElement('script');
-    contactUpgradeScript.src = 'contact-upgrade.js?v=20260725-2';
+    contactUpgradeScript.src = 'contact-upgrade.js?v=20260726-3';
     contactUpgradeScript.defer = true;
     document.head.appendChild(contactUpgradeScript);
 
