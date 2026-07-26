@@ -40,9 +40,18 @@
     </div>
   `;
 
+  const removeLegacyDetails = () => {
+    infoColumn.querySelectorAll('.contact-details').forEach(el => el.remove());
+    infoColumn.querySelectorAll(':scope > p').forEach(el => el.remove());
+  };
+
+  removeLegacyDetails();
+  new MutationObserver(removeLegacyDetails).observe(infoColumn, { childList: true });
+
   const style = document.createElement('style');
   style.textContent = `
-    #contact .contact-grid>div:first-child>p{display:none!important}
+    #contact .contact-grid>div:first-child>p,
+    #contact .contact-grid>div:first-child>.contact-details{display:none!important}
     .contact-links-modern{display:grid;gap:14px;margin-top:24px}
     .contact-item{display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);text-decoration:none;color:#fff;border-radius:14px;transition:.22s ease}
     .contact-item:hover{transform:translateX(5px);border-color:rgba(239,55,35,.7);background:rgba(239,55,35,.08)}
