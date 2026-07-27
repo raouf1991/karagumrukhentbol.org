@@ -9,12 +9,14 @@ if (isMainAdmin) {
   const loadAdminScript = (src, marker) => {
     if (document.querySelector(`script[data-admin-loader="${marker}"]`)) return;
     const script = document.createElement('script');
-    script.src = `${src}${src.includes('?') ? '&' : '?'}cb=20260727-membership-types1`;
+    script.src = `${src}${src.includes('?') ? '&' : '?'}cb=20260727-membership-type2`;
+    script.async = false;
     script.defer = true;
     script.dataset.adminLoader = marker;
     document.head.appendChild(script);
   };
 
+  loadAdminScript('admin-membership-dropdown-fix.js?v=20260727-1', 'membership-dropdown-fix');
   loadAdminScript('admin-membership-approval.js?v=20260727-membership-types1', 'membership-approval');
   loadAdminScript('admin-player-profiles-link.js?v=20260724-edu4', 'player-profiles');
   loadAdminScript('admin-academy.js?v=20260721-sync3', 'academy');
