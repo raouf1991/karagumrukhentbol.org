@@ -1,11 +1,13 @@
 (()=>{
   const cfg=window.KH_SUPABASE||{};
+  const MEMBERSHIP_TYPES=['Tam Üyelik','Onursal Üyelik','Ziyaretçi Üyeliği','Sporcu Üyeliği'];
   let approvalDb=null,decorateTimer=null;
   const notify=(text,error=false)=>{const el=document.getElementById('toast');if(el){el.textContent=text;el.style.background=error?'#8b0000':'#111';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),5000);}else alert(text);};
   const client=()=>{if(approvalDb)return approvalDb;if(!window.supabase||!cfg.url||!cfg.publishableKey)return null;approvalDb=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return approvalDb;};
   const addYears=(value,years=1)=>{const d=new Date(value||Date.now());d.setFullYear(d.getFullYear()+Number(years||1));return d.toISOString().slice(0,10);};
   const fmt=value=>value?new Intl.DateTimeFormat('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(value)):'—';
   const esc=(v='')=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const isOfficialType=value=>MEMBERSHIP_TYPES.includes(String(value||''));
 
   async function sendCard(db,row){const {error}=await db.functions.invoke('send-membership-approved-v3',{body:row});if(error)throw error;}
 
@@ -28,14 +30,29 @@
     }catch(error){notify('Başvuru silinemedi: '+(error.message||String(error)),true);button.disabled=false;}
   }
 
+  async function saveMembershipType(select,row){
+    const db=client();if(!db)return notify('Supabase bağlantısı hazır değil.',true);
+    const previous=row.membership_type||'';
+    select.disabled=true;
+    try{
+      const value=select.value;
+      if(!isOfficialType(value))throw new Error('Geçerli bir üyelik türü seçiniz.');
+      const {error}=await db.from('membership_requests').update({membership_type:value}).eq('id',row.id);if(error)throw error;
+      row.membership_type=value;
+      notify(`Üyelik türü kaydedildi: ${value}`);
+      scheduleDecorate();
+    }catch(error){select.value=previous;notify('Üyelik türü kaydedilemedi: '+(error.message||String(error)),true);}finally{select.disabled=false;}
+  }
+
   async function approveMembership(select){
     const db=client();if(!db)return notify('Supabase bağlantısı hazır değil.',true);
     const id=select.dataset.id,previous=select.dataset.previous||'new';select.disabled=true;
     try{
       const {data:row,error:readError}=await db.from('membership_requests').select('*').eq('id',id).single();if(readError)throw readError;
-      if(!confirm(`${row.full_name} için üyeliği onaylayıp dijital üyelik kartını ${row.email} adresine göndermek istiyor musunuz?`)){select.value=row.status||previous;return;}
+      if(!isOfficialType(row.membership_type))throw new Error('Onaylamadan önce üyelik türünü seçiniz.');
+      if(!confirm(`${row.full_name} için ${row.membership_type} türündeki üyeliği onaylayıp dijital üyelik kartını ${row.email} adresine göndermek istiyor musunuz?`)){select.value=row.status||previous;return;}
       let number=row.membership_number;if(!number){const {data,error}=await db.rpc('generate_membership_number');if(error)throw error;number=data;}
-      const approvedAt=row.approved_at||new Date().toISOString(),validUntil=row.valid_until||addYears(approvedAt,1),membershipType=row.membership_type||'Yetişkin Üye';
+      const approvedAt=row.approved_at||new Date().toISOString(),validUntil=row.valid_until||addYears(approvedAt,1),membershipType=row.membership_type;
       const update={status:'accepted',membership_number:number,membership_type:membershipType,approved_at:approvedAt,valid_until:validUntil,member_portal_enabled:true};
       const {data:updated,error:updateError}=await db.from('membership_requests').update(update).eq('id',id).select('*').single();if(updateError)throw updateError;
       notify('Üyelik onaylandı, kart hazırlanıyor...');await sendCard(db,updated);notify(`Üyelik kartı gönderildi. Üyelik No: ${number}`);select.value='accepted';select.dataset.previous='accepted';scheduleDecorate();
@@ -44,14 +61,27 @@
 
   async function resendMembership(button){
     const db=client();if(!db)return notify('Supabase bağlantısı hazır değil.',true);button.disabled=true;const original=button.textContent;button.textContent='Gönderiliyor...';
-    try{const {data:row,error}=await db.from('membership_requests').select('*').eq('id',button.dataset.id).single();if(error)throw error;if(row.status!=='accepted'||!row.membership_number)throw new Error('Üyelik henüz onaylanmamış.');if(!confirm(`${row.full_name} için kart tekrar gönderilsin mi?`))return;await sendCard(db,row);notify(`Üyelik kartı ${row.email} adresine yeniden gönderildi.`);}
+    try{const {data:row,error}=await db.from('membership_requests').select('*').eq('id',button.dataset.id).single();if(error)throw error;if(row.status!=='accepted'||!row.membership_number)throw new Error('Üyelik henüz onaylanmamış.');if(!isOfficialType(row.membership_type))throw new Error('Kartı göndermeden önce üyelik türünü seçiniz.');if(!confirm(`${row.full_name} için ${row.membership_type} kartı tekrar gönderilsin mi?`))return;await sendCard(db,row);notify(`Üyelik kartı ${row.email} adresine yeniden gönderildi.`);}
     catch(error){notify('Kart yeniden gönderilemedi: '+(error.message||String(error)),true);}finally{button.disabled=false;button.textContent=original;}
   }
 
   async function decorateMembershipCards(){
     const db=client(),list=document.getElementById('membershipList');if(!db||!list)return;const selects=[...list.querySelectorAll('[data-status-table="membership_requests"]')];if(!selects.length)return;
     const {data,error}=await db.from('membership_requests').select('*').in('id',selects.map(s=>s.dataset.id));if(error)return;const rows=new Map((data||[]).map(r=>[String(r.id),r]));
-    selects.forEach(select=>{select.dataset.previous=select.value;const row=rows.get(String(select.dataset.id)),card=select.closest('.card');if(!row||!card)return;card.querySelector('.membership-meta')?.remove();card.querySelector('.membership-actions-extra')?.remove();const actions=document.createElement('div');actions.className='actions membership-actions-extra';const print=document.createElement('button');print.className='btn dark';print.textContent='Başvuruyu Yazdır';print.onclick=()=>printMembership(row);actions.appendChild(print);if(row.status==='accepted'&&row.membership_number){const resend=document.createElement('button');resend.className='btn dark';resend.dataset.id=row.id;resend.textContent='Üyelik Kartını Yeniden Gönder';resend.onclick=()=>resendMembership(resend);actions.appendChild(resend)}const del=document.createElement('button');del.className='btn danger';del.textContent='Başvuruyu Sil';del.onclick=()=>deleteMembership(del,row);actions.appendChild(del);card.appendChild(actions);if(row.status==='accepted'&&row.membership_number){const meta=document.createElement('div');meta.className='membership-meta';meta.style.cssText='margin-top:12px;padding:12px;border-radius:9px;background:#f3f4f6;border-left:4px solid #d50909;line-height:1.65';meta.innerHTML=`${row.photo_url?`<img src="${esc(row.photo_url)}" style="width:76px;height:92px;object-fit:cover;border-radius:8px;float:right">`:''}<strong>Üyelik No: ${esc(row.membership_number)}</strong><br>Tür: ${esc(row.membership_type||'Yetişkin Üye')}<br>Geçerlilik: ${fmt(row.valid_until)}<br>Üye portalı: ${row.member_portal_enabled?'Aktif':'Kapalı'}<div style="clear:both"></div>`;card.insertBefore(meta,actions)}});
+    selects.forEach(select=>{
+      select.dataset.previous=select.value;
+      const row=rows.get(String(select.dataset.id)),card=select.closest('.card');if(!row||!card)return;
+      card.querySelector('.membership-type-control')?.remove();card.querySelector('.membership-meta')?.remove();card.querySelector('.membership-actions-extra')?.remove();
+
+      const typeControl=document.createElement('div');typeControl.className='field membership-type-control';typeControl.style.cssText='margin-top:14px;max-width:360px';
+      const label=document.createElement('label');label.textContent='Üyelik Türü';label.style.fontWeight='700';
+      const typeSelect=document.createElement('select');typeSelect.dataset.membershipTypeId=row.id;typeSelect.innerHTML=`<option value="">Üyelik türü seçiniz</option>${MEMBERSHIP_TYPES.map(type=>`<option value="${esc(type)}" ${row.membership_type===type?'selected':''}>${esc(type)}</option>`).join('')}`;
+      if(row.membership_type&&!isOfficialType(row.membership_type)){const legacy=document.createElement('option');legacy.value=row.membership_type;legacy.textContent=`Mevcut: ${row.membership_type}`;legacy.selected=true;typeSelect.appendChild(legacy);}
+      typeSelect.onchange=()=>saveMembershipType(typeSelect,row);typeControl.append(label,typeSelect);card.appendChild(typeControl);
+
+      const actions=document.createElement('div');actions.className='actions membership-actions-extra';const print=document.createElement('button');print.className='btn dark';print.textContent='Başvuruyu Yazdır';print.onclick=()=>printMembership(row);actions.appendChild(print);if(row.status==='accepted'&&row.membership_number){const resend=document.createElement('button');resend.className='btn dark';resend.dataset.id=row.id;resend.textContent='Üyelik Kartını Yeniden Gönder';resend.onclick=()=>resendMembership(resend);actions.appendChild(resend)}const del=document.createElement('button');del.className='btn danger';del.textContent='Başvuruyu Sil';del.onclick=()=>deleteMembership(del,row);actions.appendChild(del);card.appendChild(actions);
+      if(row.status==='accepted'&&row.membership_number){const meta=document.createElement('div');meta.className='membership-meta';meta.style.cssText='margin-top:12px;padding:12px;border-radius:9px;background:#f3f4f6;border-left:4px solid #d50909;line-height:1.65';meta.innerHTML=`${row.photo_url?`<img src="${esc(row.photo_url)}" style="width:76px;height:92px;object-fit:cover;border-radius:8px;float:right">`:''}<strong>Üyelik No: ${esc(row.membership_number)}</strong><br>Tür: ${esc(row.membership_type||'Seçilmedi')}<br>Geçerlilik: ${fmt(row.valid_until)}<br>Üye portalı: ${row.member_portal_enabled?'Aktif':'Kapalı'}<div style="clear:both"></div>`;card.insertBefore(meta,actions)}
+    });
   }
   function scheduleDecorate(){clearTimeout(decorateTimer);decorateTimer=setTimeout(decorateMembershipCards,350)}
 
@@ -72,7 +102,7 @@
     const db=client();if(!db)return;button.disabled=true;
     try{
       const {data:req,error}=await db.from('membership_renewals').select('*').eq('id',id).single();if(error)throw error;if(!confirm(`${req.membership_number} numaralı üyeliği ${req.requested_years} yıl yenilemek istiyor musunuz?`))return;
-      const {data:member,error:mErr}=await db.from('membership_requests').select('*').eq('id',req.membership_request_id).single();if(mErr)throw mErr;
+      const {data:member,error:mErr}=await db.from('membership_requests').select('*').eq('id',req.membership_request_id).single();if(mErr)throw mErr;if(!isOfficialType(member.membership_type))throw new Error('Kartı göndermeden önce üyelik türünü seçiniz.');
       const base=new Date(member.valid_until)>new Date()?member.valid_until:new Date().toISOString(),newValid=addYears(base,req.requested_years);
       const {data:updated,error:uErr}=await db.from('membership_requests').update({valid_until:newValid,status:'accepted',member_portal_enabled:true}).eq('id',member.id).select('*').single();if(uErr)throw uErr;
       const {error:rErr}=await db.from('membership_renewals').update({status:'accepted',reviewed_at:new Date().toISOString(),reviewed_by:(await db.auth.getUser()).data.user?.email||'',new_valid_until:newValid,updated_at:new Date().toISOString()}).eq('id',id);if(rErr)throw rErr;
