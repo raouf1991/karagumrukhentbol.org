@@ -9,7 +9,7 @@ if (isMainAdmin) {
   const loadAdminScript = (src, marker) => {
     if (document.querySelector(`script[data-admin-loader="${marker}"]`)) return;
     const script = document.createElement('script');
-    script.src = `${src}${src.includes('?') ? '&' : '?'}cb=20260727-membership-type2`;
+    script.src = `${src}${src.includes('?') ? '&' : '?'}cb=20260729-tv1`;
     script.async = false;
     script.defer = true;
     script.dataset.adminLoader = marker;
@@ -23,6 +23,7 @@ if (isMainAdmin) {
   loadAdminScript('admin-donations.js?v=20260721-3', 'donations');
   loadAdminScript('admin-tickets.js?v=20260724-edu4', 'tickets');
   loadAdminScript('admin-education.js?v=20260724-edu4', 'education');
+  loadAdminScript('admin-tv.js?v=20260729-1', 'hentbol-tv');
 } else {
   const performanceScript = document.createElement('script');
   performanceScript.src = 'performance-upgrade.js?v=20260722-1';
@@ -33,6 +34,11 @@ if (isMainAdmin) {
   educationNavScript.src = 'education-nav.js?v=20260724-1';
   educationNavScript.defer = true;
   document.head.appendChild(educationNavScript);
+
+  const tvNavScript = document.createElement('script');
+  tvNavScript.src = 'tv-nav.js?v=20260729-1';
+  tvNavScript.defer = true;
+  document.head.appendChild(tvNavScript);
 
   if (location.pathname.endsWith('/') || location.pathname.endsWith('/index.html')) {
     const heroPlayerScript = document.createElement('script');
