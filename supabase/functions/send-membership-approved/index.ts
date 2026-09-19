@@ -66,81 +66,65 @@ async function drawMemberPhoto(pdf: PDFDocument, page: any, photoUrl: string) {
 async function createMembershipPdf(data: {
   name: string; number: string; type: string; approvedAt: string; validUntil: string; verifyUrl: string; photoUrl: string;
 }) {
-  const pdf = await PDFDocument.create();
-  const regular = await pdf.embedFont(StandardFonts.Helvetica);
-  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-
-  // ISO/IEC 7810 ID-1 bank-card ratio: 85.60 x 53.98 mm.
-  // Each PDF page is exactly one card face at physical ATM/credit-card size.
-  const mm = 72 / 25.4;
-  const W = 85.60 * mm, H = 53.98 * mm;
-  const black=rgb(0.025,0.027,0.03), red=rgb(0.88,0.025,0.03), white=rgb(1,1,1), gray=rgb(.70,.70,.70);
+  // NEW CARD SYSTEM ONLY — old membership-card renderer removed.
+  // ISO/IEC 7810 ID-1: 85.60 x 53.98 mm, one face per PDF page.
+  const pdf=await PDFDocument.create();
+  const bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+  const regular=await pdf.embedFont(StandardFonts.Helvetica);
+  const mm=72/25.4, W=85.60*mm, H=53.98*mm;
+  const black=rgb(.018,.02,.022), red=rgb(.91,.025,.03), white=rgb(1,1,1), gray=rgb(.72,.72,.72);
 
   let logo:any=null;
-  try {
-    const r=await fetch('https://karagumrukhentbol.org/assets/club-logo.png?v=20260919-card');
-    if(r.ok) logo=await pdf.embedPng(await r.arrayBuffer());
-  } catch(_){}
+  try{const r=await fetch('https://karagumrukhentbol.org/assets/club-logo.png?new-card=1');if(r.ok)logo=await pdf.embedPng(await r.arrayBuffer())}catch(_){}
 
-  const front=pdf.addPage([W,H]);
-  front.drawRectangle({x:0,y:0,width:W,height:H,color:black});
-  front.drawRectangle({x:0,y:0,width:W,height:4,color:red});
-  front.drawRectangle({x:0,y:H-4,width:W,height:4,color:red});
-  front.drawRectangle({x:W-4,y:0,width:4,height:H,color:red});
-  front.drawRectangle({x:0,y:0,width:4,height:H,color:red});
-  front.drawRectangle({x:W*.70,y:0,width:W*.30,height:H,color:rgb(.08,.01,.015),opacity:.88});
-  front.drawRectangle({x:W*.70,y:0,width:3,height:H,color:red});
-  if(logo) front.drawImage(logo,{x:12,y:H-43,width:32,height:32});
-  front.drawText('KARAGUMRUK',{x:51,y:H-24,size:10.5,font:bold,color:white});
-  front.drawText('HENTBOL SPOR KULUBU',{x:51,y:H-34,size:5.8,font:bold,color:white});
-
-  // Member photo box
-  if(data.photoUrl){
-    try{
-      const r=await fetch(data.photoUrl);
-      if(r.ok){
-        const buf=await r.arrayBuffer();
-        const ct=(r.headers.get('content-type')||'').toLowerCase();
-        const im=ct.includes('jpeg')||ct.includes('jpg')?await pdf.embedJpg(buf):await pdf.embedPng(buf);
-        const x=12,y=48,bw=43,bh=55,sc=Math.max(bw/im.width,bh/im.height),iw=im.width*sc,ih=im.height*sc;
-        front.drawRectangle({x:x-1.5,y:y-1.5,width:bw+3,height:bh+3,color:white});
-        front.drawImage(im,{x:x+(bw-iw)/2,y:y+(bh-ih)/2,width:iw,height:ih});
-        front.drawRectangle({x:x-2.5,y:y-2.5,width:3,height:bh+5,color:red});
-      }
+  async function photo(page:any){
+    if(!data.photoUrl)return;
+    try{const r=await fetch(data.photoUrl);if(!r.ok)return;const b=await r.arrayBuffer();const t=(r.headers.get('content-type')||'').toLowerCase();const im=t.includes('jpeg')||t.includes('jpg')?await pdf.embedJpg(b):await pdf.embedPng(b);
+      const x=13,y=45,bw=46,bh=57,sc=Math.max(bw/im.width,bh/im.height),iw=im.width*sc,ih=im.height*sc;
+      page.drawRectangle({x:x-2,y:y-2,width:bw+4,height:bh+4,color:white});
+      page.drawImage(im,{x:x+(bw-iw)/2,y:y+(bh-ih)/2,width:iw,height:ih});
+      page.drawRectangle({x:x-3,y:y-3,width:3,height:bh+6,color:red});
     }catch(_){}
   }
+  function accents(p:any){
+    p.drawRectangle({x:0,y:0,width:W,height:H,color:black});
+    p.drawRectangle({x:0,y:0,width:W,height:3,color:red});
+    p.drawRectangle({x:W-4,y:0,width:4,height:H,color:red});
+    p.drawRectangle({x:0,y:H-4,width:48,height:4,color:red});
+    p.drawRectangle({x:W-38,y:H-4,width:38,height:4,color:red});
+    p.drawRectangle({x:0,y:0,width:5,height:48,color:rgb(.35,.01,.015),opacity:.85});
+    p.drawRectangle({x:W-26,y:H-40,width:26,height:40,color:rgb(.25,.01,.015),opacity:.75});
+  }
 
-  front.drawText(pdfSafe(data.name).toUpperCase(),{x:63,y:88,size:11,font:bold,color:white});
-  front.drawText('Uyelik No',{x:63,y:74,size:5,font:regular,color:gray});
-  front.drawText(pdfSafe(data.number),{x:91,y:74,size:6.3,font:bold,color:white});
-  front.drawText('Uyelik Turu',{x:63,y:62,size:5,font:regular,color:gray});
-  front.drawText(pdfSafe(data.type),{x:91,y:62,size:6.3,font:bold,color:white});
-  front.drawText('Gecerlilik',{x:63,y:50,size:5,font:regular,color:gray});
-  front.drawText(pdfSafe(fmt(data.approvedAt))+' - '+pdfSafe(fmt(data.validUntil)),{x:91,y:50,size:5.4,font:regular,color:white});
-  front.drawText('DAIMA DAHA',{x:12,y:16,size:8,font:bold,color:white});
-  front.drawText('ILERI',{x:58,y:16,size:8,font:bold,color:red});
+  const front=pdf.addPage([W,H]); accents(front);
+  if(logo)front.drawImage(logo,{x:13,y:H-42,width:31,height:31});
+  front.drawText('KARAGUMRUK',{x:50,y:H-23,size:10.5,font:bold,color:white});
+  front.drawText('HENTBOL SPOR KULUBU',{x:50,y:H-34,size:6,font:bold,color:white});
+  await photo(front);
+  front.drawText(pdfSafe(data.name).toUpperCase(),{x:66,y:91,size:11.5,font:bold,color:white});
+  front.drawText('Uyelik No',{x:66,y:75,size:5.2,font:regular,color:gray});
+  front.drawText(pdfSafe(data.number),{x:96,y:75,size:6.4,font:bold,color:white});
+  front.drawText('Uyelik Turu',{x:66,y:62,size:5.2,font:regular,color:gray});
+  front.drawText(pdfSafe(data.type),{x:96,y:62,size:6.4,font:bold,color:white});
+  front.drawText('Gecerlilik',{x:66,y:49,size:5.2,font:regular,color:gray});
+  front.drawText(pdfSafe(fmt(data.validUntil)),{x:96,y:49,size:6.1,font:bold,color:white});
+  const q=await QRCode.toDataURL(data.verifyUrl,{margin:1,width:200,color:{dark:'#111111',light:'#ffffff'}});
+  const qi=await pdf.embedPng(dataUrlToBytes(q));
+  front.drawRectangle({x:W-55,y:53,width:42,height:42,color:white});
+  front.drawImage(qi,{x:W-52,y:56,width:36,height:36});
+  front.drawText('QR ILE DOGRULA',{x:W-56,y:44,size:4.3,font:bold,color:white});
+  front.drawText('DAIMA DAHA',{x:13,y:15,size:8.3,font:bold,color:white});
+  front.drawText('ILERI',{x:61,y:15,size:8.3,font:bold,color:red});
+  front.drawText('KARAGUMRUK',{x:W-58,y:24,size:6.3,font:bold,color:white});
+  front.drawText('HENTBOL SPOR KULUBU',{x:W-58,y:17,size:4.1,font:bold,color:white});
 
-  const qr=await QRCode.toDataURL(data.verifyUrl,{margin:1,width:180,color:{dark:'#111111',light:'#ffffff'}});
-  const qi=await pdf.embedPng(dataUrlToBytes(qr));
-  front.drawRectangle({x:W-58,y:54,width:42,height:42,color:white});
-  front.drawImage(qi,{x:W-55,y:57,width:36,height:36});
-  front.drawText('QR ILE DOGRULA',{x:W-58,y:46,size:4.5,font:bold,color:white});
-  front.drawText('KARAGUMRUK',{x:W-59,y:24,size:6.5,font:bold,color:white});
-  front.drawText('HENTBOL SPOR KULUBU',{x:W-59,y:17,size:4.2,font:bold,color:white});
-
-  const back=pdf.addPage([W,H]);
-  back.drawRectangle({x:0,y:0,width:W,height:H,color:black});
-  back.drawRectangle({x:0,y:0,width:W,height:4,color:red});
-  back.drawRectangle({x:0,y:H-4,width:W,height:4,color:red});
-  // diagonal red accents
-  back.drawRectangle({x:0,y:0,width:8,height:H,color:rgb(.25,.01,.015),opacity:.7});
-  back.drawRectangle({x:W-18,y:0,width:18,height:H,color:rgb(.22,.01,.015),opacity:.75});
-  back.drawRectangle({x:W-15,y:0,width:4,height:H,color:red});
-  if(logo) back.drawImage(logo,{x:(W-82)/2,y:(H-82)/2+8,width:82,height:82});
-  back.drawText('DAIMA',{x:W-54,y:37,size:9,font:bold,color:white});
-  back.drawText('DAHA',{x:W-54,y:27,size:9,font:bold,color:white});
-  back.drawText('ILERI',{x:W-54,y:16,size:10,font:bold,color:red});
-  back.drawText('www.karagumrukhentbol.org',{x:W/2-38,y:10,size:5.3,font:bold,color:white});
+  const back=pdf.addPage([W,H]); accents(back);
+  back.drawRectangle({x:0,y:0,width:W,height:H,color:rgb(.015,.017,.019),opacity:.55});
+  if(logo)back.drawImage(logo,{x:(W-88)/2,y:(H-88)/2+7,width:88,height:88});
+  back.drawText('DAIMA',{x:W-57,y:39,size:9.5,font:bold,color:white});
+  back.drawText('DAHA',{x:W-57,y:28,size:9.5,font:bold,color:white});
+  back.drawText('ILERI',{x:W-57,y:16,size:10.5,font:bold,color:red});
+  back.drawText('www.karagumrukhentbol.org',{x:W/2-39,y:9,size:5.2,font:bold,color:white});
   return await pdf.save();
 }
 
