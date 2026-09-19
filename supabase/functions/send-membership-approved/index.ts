@@ -93,6 +93,7 @@ async function createMembershipPdf(data: {
   page.drawImage(qrImage, { x: 626, y: 186, width: 118, height: 118 });
 
   page.drawText('KARAGUMRUK', { x: 195, y: 386, size: 37, font: bold, color: rgb(1, 1, 1) });
+  page.drawText('DAIMA DAHA ILERI', { x: 600, y: 88, size: 17, font: bold, color: rgb(1, 1, 1) });
   page.drawText('HENTBOL SPOR KULUBU', { x: 195, y: 348, size: 24, font: bold, color: rgb(0.88, 0.08, 0.06) });
   page.drawText('UYELIK KARTI  /  MEMBERSHIP CARD', { x: 195, y: 315, size: 16, font: regular, color: rgb(0.92, 0.92, 0.92) });
 
@@ -107,7 +108,7 @@ async function createMembershipPdf(data: {
   page.drawText(`${pdfSafe(fmt(data.approvedAt))} - ${pdfSafe(fmt(data.validUntil))}`, { x: 330, y: 130, size: 14, font: regular, color: rgb(1, 1, 1) });
 
   page.drawText('Karti dogrulamak icin QR kodu tarayin', { x: 601, y: 150, size: 10, font: regular, color: rgb(1, 1, 1) });
-  page.drawText('karagumrukhentbol.org', { x: 42, y: 22, size: 15, font: bold, color: rgb(1, 1, 1) });
+  page.drawText('www.karagumrukhentbol.org', { x: 42, y: 22, size: 15, font: bold, color: rgb(1, 1, 1) });
   page.drawText('Raouf Tarek  -  Kulup Baskani', { x: 548, y: 22, size: 13, font: bold, color: rgb(1, 1, 1) });
 
   return await pdf.save();
