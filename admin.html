@@ -8,6 +8,26 @@
 
 /* 2026 club identity */
 .side{background:linear-gradient(180deg,#101214,#181b1e)!important}.side img{width:88px!important;height:88px;object-fit:contain;border:3px solid #fff;box-shadow:0 8px 25px #0006}.side h2:after{content:"\A Hentbol Spor Kulübü";white-space:pre;font-size:13px;font-weight:500;color:#bbb}.side button:hover,.side a:hover{color:#ff3333}.primary{background:#e51619!important}.top h1{font-weight:900}.login-card img{width:125px!important;height:125px;object-fit:contain;border-radius:50%;box-shadow:0 12px 35px #0002}
+
+/* Membership card — approved single-face design */
+.member-admin-card{border:1px solid #ddd;border-radius:14px;padding:16px;margin:16px 0;background:#fff}
+.member-admin-grid{display:grid;grid-template-columns:minmax(330px,520px) 1fr;gap:20px;align-items:start}
+.member-card-face{position:relative;overflow:hidden;aspect-ratio:1.586/1;background:linear-gradient(135deg,#08090b 0%,#15171a 58%,#870000 100%);color:#fff;border-radius:18px;padding:22px;box-shadow:0 14px 38px #0004;font-family:Arial,sans-serif}
+.member-card-face:before{content:"";position:absolute;width:310px;height:310px;border-radius:50%;background:#e51619;right:-190px;top:-170px;opacity:.88}
+.member-card-face:after{content:"";position:absolute;inset:auto -70px -125px auto;width:290px;height:220px;border:24px solid #ffffff0b;transform:rotate(-18deg);border-radius:50%}
+.member-card-head{position:relative;z-index:2;display:flex;align-items:center;gap:11px;border-bottom:1px solid #ffffff38;padding-bottom:10px}
+.member-card-head img{width:58px;height:58px;object-fit:contain;border-radius:50%;background:#fff}
+.member-card-club{font-weight:900;font-size:15px;line-height:1.08;letter-spacing:.3px}.member-card-club small{display:block;color:#ff3535;font-size:10px;letter-spacing:1.5px;margin-top:4px}
+.member-card-body{position:relative;z-index:2;display:grid;grid-template-columns:104px 1fr 82px;gap:14px;align-items:center;padding-top:14px}
+.member-card-photo{width:104px;height:126px;object-fit:cover;border:3px solid #fff;border-radius:10px;background:#292929}
+.member-card-name{font-weight:900;font-size:20px;line-height:1.05;margin-bottom:12px;text-transform:uppercase}
+.member-card-label{font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-top:7px}.member-card-value{font-size:12px;font-weight:800;margin-top:2px}
+.member-card-qr{background:#fff;padding:5px;border-radius:7px;width:82px;height:82px;display:grid;place-items:center}.member-card-qr img,.member-card-qr canvas{max-width:72px!important;max-height:72px!important}
+.member-card-qr-note{text-align:center;font-size:7px;color:#ddd;margin-top:5px;line-height:1.2}
+.member-card-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.member-card-controls label{font-size:12px;font-weight:700}.member-card-controls input,.member-card-controls select{width:100%;padding:9px;border:1px solid #ccc;border-radius:7px;margin-top:4px}
+@media(max-width:900px){.member-admin-grid{grid-template-columns:1fr}.member-card-face{max-width:520px}.member-card-controls{grid-template-columns:1fr}}
+@media print{body *{visibility:hidden!important}.member-card-face,.member-card-face *{visibility:visible!important}.member-card-face{position:fixed!important;left:10mm!important;top:10mm!important;width:160mm!important;height:auto!important;box-shadow:none!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
+
 </style>
 </head>
 <body>
@@ -28,5 +48,5 @@
 <div id="academy" class="tab hidden"><div class="panel"><h2>Akademi Başvuruları</h2><div id="academyList"></div></div></div><div id="membership" class="tab hidden"><div class="panel"><h2>Üyelik Başvuruları</h2><div id="membershipList"></div></div></div>
 <div id="sponsors" class="tab hidden"><div class="panel"><h2>Sponsor Ekle</h2><form id="sponsorForm" class="grid2"><div class="field"><label>Ad</label><input name="name" required></div><div class="field"><label>Sponsor logosu</label><input type="file" name="image_file" accept="image/jpeg,image/png,image/webp"><span class="hint">JPG, PNG veya WEBP — en fazla 5 MB</span></div><div class="field"><label>Web sitesi</label><input name="website_url"></div><div class="field"><label>Sıra</label><input type="number" name="sort_order" value="0"></div><div class="actions"><button class="btn primary">Sponsor Ekle</button></div></form><div id="sponsorList"></div></div></div>
 </main></section><div id="toast" class="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.min.js"></script><script src="supabase-config.js?v=20260719"></script><script src="admin.js?v=20260719-matchlogo"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.min.js"></script><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script src="supabase-config.js?v=20260719"></script><script src="admin.js?v=20260919-membercard1"></script>
 </body></html>
