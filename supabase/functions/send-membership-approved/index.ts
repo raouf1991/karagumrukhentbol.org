@@ -64,59 +64,49 @@ async function drawMemberPhoto(pdf: PDFDocument, page: any, photoUrl: string) {
 }
 
 async function createMembershipPdf(data: {
-  name: string;
-  number: string;
-  type: string;
-  approvedAt: string;
-  validUntil: string;
-  verifyUrl: string;
-  photoUrl: string;
+  name: string; number: string; type: string; approvedAt: string; validUntil: string; verifyUrl: string; photoUrl: string;
 }) {
   const pdf = await PDFDocument.create();
-  const page = pdf.addPage([792, 468]);
+  const page = pdf.addPage([842, 530]);
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-
-  page.drawRectangle({ x: 0, y: 0, width: 792, height: 468, color: rgb(0.055, 0.055, 0.055) });
-  page.drawRectangle({ x: 0, y: 0, width: 792, height: 58, color: rgb(0.78, 0.04, 0.03) });
-  page.drawRectangle({ x: 575, y: 58, width: 217, height: 410, color: rgb(0.45, 0, 0), opacity: 0.9 });
-
-  await drawMemberPhoto(pdf, page, data.photoUrl);
-
-  const qrDataUrl = await QRCode.toDataURL(data.verifyUrl, {
-    margin: 1,
-    width: 220,
-    color: { dark: '#111111', light: '#ffffff' },
-  });
-  const qrImage = await pdf.embedPng(dataUrlToBytes(qrDataUrl));
-  page.drawRectangle({ x: 620, y: 180, width: 130, height: 130, color: rgb(1, 1, 1) });
-  page.drawImage(qrImage, { x: 626, y: 186, width: 118, height: 118 });
-
-  page.drawText('KARAGUMRUK', { x: 195, y: 386, size: 37, font: bold, color: rgb(1, 1, 1) });
-  page.drawText('DAIMA DAHA ILERI', { x: 600, y: 88, size: 17, font: bold, color: rgb(1, 1, 1) });
-  page.drawText('HENTBOL SPOR KULUBU', { x: 195, y: 348, size: 24, font: bold, color: rgb(0.88, 0.08, 0.06) });
-  page.drawText('UYELIK KARTI  /  MEMBERSHIP CARD', { x: 195, y: 315, size: 16, font: regular, color: rgb(0.92, 0.92, 0.92) });
-
-  page.drawText('UYE ADI', { x: 50, y: 244, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
-  page.drawText(pdfSafe(data.name), { x: 50, y: 214, size: 23, font: bold, color: rgb(1, 1, 1) });
-  page.drawText('UYELIK NUMARASI', { x: 50, y: 160, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
-  page.drawText(pdfSafe(data.number), { x: 50, y: 130, size: 22, font: bold, color: rgb(1, 1, 1) });
-
-  page.drawText('UYELIK TURU', { x: 330, y: 244, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
-  page.drawText(pdfSafe(data.type), { x: 330, y: 214, size: 20, font: bold, color: rgb(1, 1, 1) });
-  page.drawText('KAYIT / GECERLILIK', { x: 330, y: 160, size: 12, font: bold, color: rgb(0.65, 0.65, 0.65) });
-  page.drawText(`${pdfSafe(fmt(data.approvedAt))} - ${pdfSafe(fmt(data.validUntil))}`, { x: 330, y: 130, size: 14, font: regular, color: rgb(1, 1, 1) });
-
-  page.drawText('Karti dogrulamak icin QR kodu tarayin', { x: 601, y: 150, size: 10, font: regular, color: rgb(1, 1, 1) });
-  page.drawText('www.karagumrukhentbol.org', { x: 42, y: 22, size: 15, font: bold, color: rgb(1, 1, 1) });
-  page.drawText('Raouf Tarek  -  Kulup Baskani', { x: 548, y: 22, size: 13, font: bold, color: rgb(1, 1, 1) });
-
+  page.drawRectangle({ x:0,y:0,width:842,height:530,color:rgb(0.025,0.027,0.03) });
+  page.drawRectangle({ x:0,y:0,width:842,height:18,color:rgb(0.88,0.03,0.035) });
+  page.drawRectangle({ x:0,y:512,width:842,height:18,color:rgb(0.88,0.03,0.035) });
+  page.drawRectangle({ x:610,y:18,width:232,height:494,color:rgb(0.10,0.012,0.015) });
+  page.drawRectangle({ x:615,y:18,width:7,height:494,color:rgb(0.88,0.03,0.035) });
+  try {
+    const lr=await fetch('https://karagumrukhentbol.org/assets/club-logo.png?v=20260919');
+    if(lr.ok){const li=await pdf.embedPng(await lr.arrayBuffer());page.drawImage(li,{x:38,y:386,width:104,height:104});}
+  } catch(_){}
+  page.drawText('KARAGUMRUK', {x:165,y:454,size:31,font:bold,color:rgb(1,1,1)});
+  page.drawText('HENTBOL SPOR KULUBU', {x:165,y:421,size:18,font:bold,color:rgb(.92,.08,.08)});
+  page.drawText('DIJITAL UYELIK KARTI', {x:165,y:394,size:12,font:bold,color:rgb(.72,.72,.72)});
+  await drawMemberPhoto(pdf,page,data.photoUrl);
+  const qrDataUrl=await QRCode.toDataURL(data.verifyUrl,{margin:1,width:240,color:{dark:'#111111',light:'#ffffff'}});
+  const qrImage=await pdf.embedPng(dataUrlToBytes(qrDataUrl));
+  page.drawRectangle({x:660,y:250,width:132,height:132,color:rgb(1,1,1)});
+  page.drawImage(qrImage,{x:667,y:257,width:118,height:118});
+  page.drawText('UYE', {x:190,y:330,size:11,font:bold,color:rgb(.55,.55,.55)});
+  page.drawText(pdfSafe(data.name).toUpperCase(), {x:190,y:292,size:27,font:bold,color:rgb(1,1,1)});
+  page.drawText('UYELIK NO', {x:190,y:238,size:11,font:bold,color:rgb(.55,.55,.55)});
+  page.drawText(pdfSafe(data.number), {x:190,y:205,size:22,font:bold,color:rgb(1,1,1)});
+  page.drawText('UYELIK TURU', {x:400,y:238,size:11,font:bold,color:rgb(.55,.55,.55)});
+  page.drawText(pdfSafe(data.type), {x:400,y:205,size:19,font:bold,color:rgb(1,1,1)});
+  page.drawText('GECERLILIK', {x:190,y:150,size:11,font:bold,color:rgb(.55,.55,.55)});
+  page.drawText(pdfSafe(fmt(data.approvedAt))+'  -  '+pdfSafe(fmt(data.validUntil)), {x:190,y:119,size:15,font:regular,color:rgb(1,1,1)});
+  page.drawText('DAIMA', {x:654,y:184,size:21,font:bold,color:rgb(1,1,1)});
+  page.drawText('DAHA', {x:654,y:158,size:21,font:bold,color:rgb(1,1,1)});
+  page.drawText('ILERI', {x:654,y:130,size:25,font:bold,color:rgb(.93,.08,.08)});
+  page.drawText('QR ILE DOGRULA', {x:670,y:225,size:10,font:bold,color:rgb(.75,.75,.75)});
+  page.drawText('www.karagumrukhentbol.org', {x:38,y:38,size:13,font:bold,color:rgb(1,1,1)});
+  page.drawText('Raouf Tarek  |  Kulup Baskani', {x:630,y:38,size:11,font:bold,color:rgb(1,1,1)});
   return await pdf.save();
 }
 
 function emailHtml(d: { name: string; number: string; type: string; approvedAt: string; validUntil: string }) {
   const portalUrl = 'https://karagumrukhentbol.org/member-login.html';
-  return `<!doctype html><html><body style="margin:0;background:#ececec;font-family:Arial,sans-serif;color:#171717"><table width="100%" cellpadding="0" cellspacing="0" style="padding:25px 10px"><tr><td align="center"><table width="100%" style="max-width:680px;background:#fff;border-radius:18px;overflow:hidden"><tr><td style="background:#111;padding:28px;text-align:center;border-bottom:5px solid #d50909"><img src="https://karagumrukhentbol.org/assets/club-logo.png" width="90"><h1 style="color:#fff;margin:12px 0 0">KARAGÜMRÜK HENTBOL</h1></td></tr><tr><td style="padding:34px"><div style="color:#c20d09;font-weight:800">ÜYELİK ONAYI</div><h2 style="font-size:32px">Üyelik Başvurunuz Onaylandı!</h2><p style="font-size:17px;line-height:1.7">Merhaba <strong>${esc(d.name)}</strong>,</p><p style="font-size:16px;line-height:1.7">Üyelik başvurunuz yönetimimiz tarafından onaylanmıştır. Karagümrük Hentbol ailesine hoş geldiniz.</p><div style="background:#111;border-radius:16px;overflow:hidden;margin:24px 0;color:#fff"><div style="background:linear-gradient(135deg,#111 60%,#8d0000);padding:24px"><div style="font-size:12px;color:#aaa;letter-spacing:1px">DİJİTAL ÜYELİK KARTI</div><div style="font-size:25px;font-weight:800;margin-top:8px">${esc(d.name)}</div><table width="100%" style="margin-top:22px;color:#fff"><tr><td><small style="color:#aaa">ÜYELİK NO</small><br><strong>${esc(d.number)}</strong></td><td><small style="color:#aaa">TÜR</small><br><strong>${esc(d.type)}</strong></td></tr><tr><td colspan="2" style="padding-top:18px"><small style="color:#aaa">GEÇERLİLİK</small><br>${esc(fmt(d.approvedAt))} — ${esc(fmt(d.validUntil))}</td></tr></table></div><div style="background:#c80d09;padding:13px 24px;font-weight:700">Karagümrük Hentbol Spor Kulübü</div></div><p style="font-size:16px;line-height:1.7">Fotoğrafınızı içeren yazdırılabilir dijital üyelik kartınız bu e-postaya <strong>PDF</strong> olarak eklenmiştir.</p><div style="margin:30px 0;text-align:center"><a href="${portalUrl}" style="display:inline-block;background:#d50909;color:#fff;text-decoration:none;font-size:17px;font-weight:800;padding:15px 28px;border-radius:10px">Üye Paneline Giriş</a><p style="font-size:13px;color:#666;line-height:1.6;margin-top:12px">Kayıt sırasında kullandığınız e-posta adresini girin. Size güvenli giriş bağlantısı gönderilecektir.</p></div><div style="margin-top:36px"><div style="font-family:cursive;font-size:34px">Raouf Tarek</div><strong>Raouf Tarek</strong><br>Kulüp Başkanı / Club President</div></td></tr><tr><td style="background:#111;color:#ddd;padding:22px;text-align:center">info@karagumrukhentbol.org · karagumrukhentbol.org</td></tr></table></td></tr></table></body></html>`;
+  return `<!doctype html><html><body style="margin:0;background:#ececec;font-family:Arial,sans-serif;color:#171717"><table width="100%" cellpadding="0" cellspacing="0" style="padding:25px 10px"><tr><td align="center"><table width="100%" style="max-width:680px;background:#fff;border-radius:18px;overflow:hidden"><tr><td style="background:#111;padding:28px;text-align:center;border-bottom:5px solid #d50909"><img src="https://karagumrukhentbol.org/assets/club-logo.png?v=20260919" width="110" style="border-radius:50%;background:#fff"><div style="margin:18px auto 6px;width:54px;height:4px;background:#e51619"></div><h1 style="color:#fff;margin:12px 0 0">KARAGÜMRÜK HENTBOL</h1></td></tr><tr><td style="padding:34px"><div style="color:#c20d09;font-weight:800">ÜYELİK ONAYI</div><h2 style="font-size:32px">Üyelik Başvurunuz Onaylandı!</h2><p style="font-size:17px;line-height:1.7">Merhaba <strong>${esc(d.name)}</strong>,</p><p style="font-size:16px;line-height:1.7">Üyelik başvurunuz yönetimimiz tarafından onaylanmıştır. Karagümrük Hentbol ailesine hoş geldiniz.</p><div style="background:#111;border-radius:16px;overflow:hidden;margin:24px 0;color:#fff"><div style="background:linear-gradient(135deg,#111 60%,#8d0000);padding:24px"><div style="font-size:12px;color:#aaa;letter-spacing:1px">DİJİTAL ÜYELİK KARTI</div><div style="font-size:25px;font-weight:800;margin-top:8px">${esc(d.name)}</div><table width="100%" style="margin-top:22px;color:#fff"><tr><td><small style="color:#aaa">ÜYELİK NO</small><br><strong>${esc(d.number)}</strong></td><td><small style="color:#aaa">TÜR</small><br><strong>${esc(d.type)}</strong></td></tr><tr><td colspan="2" style="padding-top:18px"><small style="color:#aaa">GEÇERLİLİK</small><br>${esc(fmt(d.approvedAt))} — ${esc(fmt(d.validUntil))}</td></tr></table></div><div style="background:#c80d09;padding:13px 24px;font-weight:700">Karagümrük Hentbol Spor Kulübü</div></div><p style="font-size:16px;line-height:1.7">Fotoğrafınızı içeren yazdırılabilir dijital üyelik kartınız bu e-postaya <strong>PDF</strong> olarak eklenmiştir.</p><div style="margin:30px 0;text-align:center"><a href="${portalUrl}" style="display:inline-block;background:#d50909;color:#fff;text-decoration:none;font-size:17px;font-weight:800;padding:15px 28px;border-radius:10px">Üye Paneline Giriş</a><p style="font-size:13px;color:#666;line-height:1.6;margin-top:12px">Kayıt sırasında kullandığınız e-posta adresini girin. Size güvenli giriş bağlantısı gönderilecektir.</p></div><div style="margin-top:36px"><div style="font-family:cursive;font-size:34px">Raouf Tarek</div><strong>Raouf Tarek</strong><br>Kulüp Başkanı / Club President</div></td></tr><tr><td style="background:#111;color:#ddd;padding:22px;text-align:center">info@karagumrukhentbol.org · karagumrukhentbol.org</td></tr></table></td></tr></table></body></html>`;
 }
 
 Deno.serve(async (req) => {
