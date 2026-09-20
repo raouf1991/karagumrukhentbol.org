@@ -42,6 +42,192 @@
 .cards-grid{gap:22px!important}.news-card{overflow:hidden!important}
 .site-footer{border-top:1px solid #ffffff12!important}
 @media(max-width:760px){#matches .two-col{gap:42px!important}.match-card{padding:24px 18px!important}.match-card .team-logo img{width:92px!important;height:92px!important}}
+#home .hero-visual::before{display:block!important;border-radius:50%}
+/* Homepage visual refinement. Kept here so shared CSS, portals and PDFs stay unchanged. */
+html{scroll-padding-top:154px}
+body{line-height:1.6}
+.container{width:min(1240px,calc(100% - 64px))}
+.site-header .nav-wrap{height:auto!important;min-height:132px;display:grid;grid-template-columns:1fr auto;gap:0 24px;padding-top:14px}
+.site-header .brand{width:fit-content;grid-column:1;grid-row:1}
+.site-header .brand img{width:58px!important;height:58px!important;flex-shrink:0}
+.site-header .brand:after{font-size:19px;line-height:1.1;letter-spacing:.6px}
+.header-actions{grid-column:2;grid-row:1;gap:10px}
+.header-actions .vitorra-mini{width:100px;height:36px;object-fit:contain;margin-right:18px}
+.lang-btn{cursor:pointer;flex-shrink:0}
+.site-header .main-nav{grid-column:1/-1;grid-row:2;justify-content:space-between;gap:16px!important;min-width:0;padding:13px 0 15px;margin-top:10px;border-top:1px solid #ffffff12}
+.main-nav a{white-space:nowrap;line-height:1.3;padding:4px 0}
+.main-nav a:after{bottom:-5px!important}
+a:focus-visible,button:focus-visible{outline:3px solid #ef5359;outline-offset:5px}
+.hero{min-height:570px!important}
+.hero-grid{min-height:570px!important;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;gap:48px}
+.hero-copy{padding:64px 0!important;min-width:0}
+.hero-copy h1{font-size:clamp(78px,7.5vw,108px)!important;line-height:.91!important;letter-spacing:-1.5px}
+.hero-copy .eyebrow{line-height:1.7;letter-spacing:2px!important}
+.hero-text{margin:24px 0 0}
+.hero-text:before{font-size:18px;line-height:1.75}
+.hero-buttons{flex-wrap:wrap;gap:12px;margin-top:28px!important}
+.hero-buttons .btn{padding:14px 20px;min-height:50px;font-size:12px;line-height:1.4}
+.hero-visual{height:460px!important;min-width:0;width:100%;margin:0}
+.hero-visual:before{width:min(100%,370px)!important}
+.quick-grid{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.quick-grid a{grid-template-columns:1fr;gap:5px;padding:22px 18px!important;min-width:0}
+.quick-grid a:first-child{border-left:1px solid #ffffff0d}
+.quick-grid span{grid-row:auto;font-size:19px!important;line-height:1.2;margin-bottom:4px}
+.quick-grid strong{font-size:19px!important;line-height:1.2}
+.quick-grid small{line-height:1.5}
+.section{padding:80px 0!important}
+.section-heading{margin-bottom:30px}
+.section-heading h2,.section h2{font-size:clamp(36px,4vw,50px);line-height:1.08;margin:10px 0 22px;overflow-wrap:break-word}
+.section-heading h2{margin-bottom:0}
+.section-kicker{font-size:11px;letter-spacing:2px;line-height:1.6}
+.cards-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px!important}
+.news-card{height:100%}
+.news-image{width:100%;height:230px;object-fit:cover}
+.news-body{padding:24px}
+.news-body h3{font-size:27px;line-height:1.2;overflow-wrap:anywhere}
+.news-body p{font-size:14px;line-height:1.75;overflow-wrap:anywhere}
+#matches .two-col{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px!important;align-items:start!important}
+#club>p,.club-extra p{font-size:15px;line-height:1.85;color:#51545a}
+.club-extra{margin-top:28px;display:grid;gap:18px}
+.club-extra h3{margin:0 0 6px;font-size:18px}
+.club-extra p{margin:0}
+.match-card{padding:30px!important}
+.match-teams{gap:16px}
+.match-teams>div{flex:1;min-width:0}
+.match-teams .team-logo img{margin:auto}
+.match-teams>strong{font-size:26px;color:#94979e;flex-shrink:0}
+.match-card .opponent{font-size:24px;line-height:1.2;overflow-wrap:anywhere}
+.match-card .match-meta{border-top:0;margin-top:0;font-size:13px;gap:12px 20px!important}
+#club .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px!important}
+#club .stats>div{padding:16px 12px!important}
+#club .stats strong{font-size:36px;line-height:1.2}
+#club .stats span{font-size:12px;margin-top:6px}
+.players-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.player{height:100%;overflow:hidden}
+.player-photo{width:100%;height:290px;object-fit:cover;object-position:top center}
+.player h3{line-height:1.2}
+.players-grid>a>small{margin-left:18px}
+.academy-grid,.membership-grid,.contact-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
+.academy-section{background:linear-gradient(120deg,#0b0d10 0 54%,#40090e 100%)!important}
+.academy-grid>div,.membership-grid>div,.contact-grid>div{padding-top:8px;min-width:0}
+.academy-grid p,.membership-intro,.conditions,.donate-box p{font-size:15px;line-height:1.85}
+.academy-grid .btn{margin-top:16px}
+.form-card{padding:32px;gap:16px;min-width:0;border:1px solid #e5e5e7;box-shadow:0 12px 36px #0000000c!important}
+.form-card h3{font-size:27px;line-height:1.2;margin-bottom:6px}
+.form-card input,.form-card select,.form-card textarea{min-width:0;font-size:16px;line-height:1.5;background:#fafafa}
+.form-card input:focus,.form-card select:focus,.form-card textarea:focus{outline:2px solid #e20b12;outline-offset:2px;border-color:#e20b12}
+.form-card input[type=file]{font-size:13px;padding:12px!important;max-width:100%}
+.form-card input[type=checkbox]{width:18px;height:18px;padding:0!important;margin:3px 0 0;flex-shrink:0;accent-color:#e20b12}
+.form-card .check{display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.form-card small,.form-note{line-height:1.6}
+.form-card .btn{min-height:50px;white-space:normal;line-height:1.5}
+.dark-form{border-color:#292b31;background:#101216}
+.dark-form input,.dark-form textarea{background:#080a0d}
+.conditions{padding-left:20px;color:#51545a}
+.conditions li{padding-left:4px;margin-bottom:12px}
+.donate-box{gap:56px}
+.donate-box>div:first-child{flex:1;min-width:0}
+#donate .section-kicker{color:#fff!important}
+.donate-actions{max-width:300px;min-width:220px;gap:14px}
+.donate-actions small{font-size:12px;line-height:1.6}
+.partner-banner{box-shadow:0 8px 30px #0000000a;object-fit:contain}
+#contact p,.contact-details{overflow-wrap:anywhere}
+.contact-details p{font-size:14px;line-height:1.8;color:#b8bcc4}
+.contact-details a:hover{color:#fff;text-decoration:underline}
+footer{padding:30px 0}
+.footer-grid{gap:24px;flex-wrap:wrap;font-size:13px}
+.footer-grid img{width:56px;height:56px;flex-shrink:0}
+.footer-grid p{margin-right:auto}
+@media(max-width:1100px){
+ html{scroll-padding-top:100px}
+ .site-header .nav-wrap{display:flex;height:84px!important;min-height:0;padding:0;gap:18px}
+ .site-header .brand:after{font-size:16px}
+ .menu-toggle{display:block;margin-left:auto;cursor:pointer;min-width:42px;min-height:44px;padding:0}
+ .header-actions .vitorra-mini{display:none}
+ .site-header .main-nav{position:absolute;display:none;top:84px;left:0;right:0;margin:0;padding:20px 32px;max-height:calc(100dvh - 84px);overflow-y:auto;background:#0b0d10;border-bottom:1px solid #ffffff20;box-shadow:0 16px 30px #0005}
+ .site-header .main-nav.open{display:flex;flex-direction:column;align-items:stretch;gap:0!important}
+ .main-nav a{padding:12px 0;border-bottom:1px solid #ffffff0a}
+ .hero-grid{gap:28px;min-height:530px!important}
+ .hero{min-height:530px!important}
+ .hero-copy h1{font-size:86px!important}
+ .hero-text:before{white-space:pre-line;font-size:16px}
+ .hero-visual{height:380px!important}
+ .hero-visual:before{width:min(100%,310px)!important}
+ .quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .quick-grid a{border-bottom:1px solid #ffffff0d!important}
+ #matches .two-col{gap:32px!important}
+ .academy-grid,.membership-grid,.contact-grid{gap:36px}
+ .players-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .donate-box{flex-direction:row;align-items:center;gap:28px}
+}
+@media(max-width:760px){
+ .container{width:calc(100% - 40px)}
+ .hero-grid{grid-template-columns:minmax(0,1fr)!important;gap:0;min-height:auto!important}
+ .hero{min-height:auto!important}
+ .hero-copy{padding:52px 0 20px!important}
+ .hero-copy h1{font-size:76px!important}
+ .hero-text:before{font-size:16px}
+ .hero-visual{height:270px!important;margin:0 auto 24px}
+ .hero-visual:before{width:235px!important}
+ .hero-buttons{flex-direction:row}
+ .hero-buttons .btn{flex:1 1 auto}
+ .section{padding:60px 0!important}
+ #matches .two-col,.academy-grid,.membership-grid,.contact-grid{grid-template-columns:minmax(0,1fr);gap:40px!important}
+ .match-card{padding:24px!important}
+ .match-card .team-logo img,.match-card .opponent img{width:100px!important;height:100px!important}
+ .match-meta{flex-direction:row}
+ .form-card{padding:26px}
+ .donate-box{flex-direction:column;align-items:stretch;gap:24px}
+ .donate-actions{max-width:none;min-width:0;text-align:left}
+ .footer-grid{justify-content:center;text-align:center;gap:16px 24px;flex-direction:row}
+ .footer-grid p{flex-basis:calc(100% - 80px);margin:0;text-align:left}
+}
+@media(max-width:480px){
+ .container{width:calc(100% - 32px)}
+ .site-header .nav-wrap{height:76px!important;gap:8px}
+ .site-header .brand{gap:8px}
+ .site-header .brand img{width:44px!important;height:44px!important}
+ .site-header .brand:after{font-size:12px;letter-spacing:.1px}
+ .header-actions{gap:5px}
+ .lang-btn{width:32px;height:32px;font-size:11px}
+ .menu-toggle{min-width:34px;font-size:25px}
+ .site-header .main-nav{top:76px;max-height:calc(100dvh - 76px);padding:16px 24px}
+ .hero-copy .eyebrow{font-size:10px!important;letter-spacing:1.5px!important}
+ .hero-copy h1{font-size:70px!important}
+ .hero-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important}
+ .hero-buttons .btn{padding:13px 10px;font-size:11px}
+ .hero-buttons .btn:first-child{grid-column:1/-1}
+ .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .quick-grid a{padding:18px 14px!important}
+ .cards-grid{grid-template-columns:minmax(0,1fr)}
+ .players-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .player-photo{height:200px}
+ .player h3{font-size:22px;margin-left:12px;margin-right:12px}
+ .player p{font-size:12px;margin-left:12px;margin-right:12px}
+ .news-body{padding:22px}
+ .section h2{font-size:36px}
+ .form-card{padding:22px}
+ .match-card{padding:22px 16px!important}
+ .match-teams{gap:12px}
+ .match-card .team-logo img,.match-card .opponent img{width:80px!important;height:80px!important}
+ .match-card .opponent{font-size:21px}
+ #club .stats>div{padding:14px 10px!important}
+ #club .stats strong{font-size:clamp(22px,7vw,32px)}
+}
+@media(max-width:360px){
+ .site-header .brand:after{font-size:9px}
+ .site-header .brand img{width:38px!important;height:38px!important}
+ .site-header .brand{gap:6px}
+ .site-header .nav-wrap{gap:5px}
+ .lang-btn{width:30px;height:30px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .btn,.quick-grid a,.news-card,.main-nav a:after{transition:none}
+ .btn:hover,.quick-grid a:hover,.news-card:hover{transform:none}
+}
+
 </style>
 <meta name="kh-brand-release" content="2026-09-19-visual4">
 </head>
